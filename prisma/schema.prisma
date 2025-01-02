@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @unique
+  type              String
+  provider          String
+  providerAccountId String
+  subscribed        Boolean @default(false)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model User {
+  id       String   @id @default(cuid())
+  admin    Boolean @default(false)
+  frozen   Boolean @default(false)
+  name     String
+  email    String   @unique
+  password String?
+  image    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  account  Account?
+  blog     Blog?
+  posts    Post[]
+}
+
+model Blog {
+  id          String   @id @default(cuid())
+  ownerId     String   @unique
+  title       String
+  description String?
+  imageURL    String?
+  tags        String[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  posts       Post[]
+}
+
+model Post {
+  id      String   @id @default(cuid())
+  ownerId String
+  blogId  String
+  title   String
+  heroImg String?
+  summary String?
+  content String @db.Text
+  tags    String[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  published  Boolean  @default(false)
+  images  Image[]
+  blog    Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  owner   User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+}
+
+model Image {
+  id        String   @id @default(cuid())
+  postId    String
+  image     String
+  alt       String?
+  caption   String?
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+}

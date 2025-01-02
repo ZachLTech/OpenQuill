@@ -1,0 +1,32 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "prisma:migrate:reset": "npx prisma migrate reset",
+    "prisma:migrate:dev": "npx prisma migrate dev",
+    "prisma:migrate:generate": "npx prisma generate",
+    "prisma:studio": "npx prisma studio",
+    "build:prod": "prisma generate && prisma migrate deploy && nuxt build",
+    "start:prod": "node .output/server/index.mjs"
+  },
+  "dependencies": {
+    "@next-auth/prisma-adapter": "^1.0.7",
+    "@prisma/client": "^6.1.0",
+    "bcrypt": "^5.1.1",
+    "next-auth": "~4.21.1",
+    "nuxt": "^3.14.1592",
+    "vue": "latest",
+    "vue-router": "latest"
+  },
+  "devDependencies": {
+    "@sidebase/nuxt-auth": "^0.10.0",
+    "@types/bcrypt": "^5.0.2",
+    "prisma": "^6.1.0"
+  }
+}
