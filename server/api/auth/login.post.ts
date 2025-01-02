@@ -4,10 +4,7 @@ export default eventHandler(async (event) => {
     const body = await readBody(event)
 
     const user = await event.context.prisma.user.findUnique({
-        where: { email: body.email },
-        include: {
-            account: true
-        }
+        where: { email: body.email }
     })
 
     if (!user || !user.password) {
@@ -30,6 +27,8 @@ export default eventHandler(async (event) => {
         id: user.id,
         email: user.email,
         name: user.name,
-        subscribed: user.account?.[0]?.subscribed || false
+        admin: user.admin,
+        frozen: user.frozen,
+        image: user.image,
     }
 })

@@ -3,6 +3,7 @@ import { hash } from 'bcrypt'
 export default defineEventHandler(async (event) => {
     try {
         const body = await readBody(event)
+        let admin = false
         
         if (!body.email || !body.password) {
             throw createError({
@@ -23,21 +24,20 @@ export default defineEventHandler(async (event) => {
             })
         }
 
+        // See if there are 0 users
+        const usrCount = await event.context.prisma.user.count()
+        if (usrCount == 0) {
+            admin = true;
+        }
+
         // Create new user
         const hashedPassword = await hash(body.password, 10)
         const user = await event.context.prisma.user.create({
             data: {
+                admin: admin,
                 email: body.email,
                 name: body.username,
                 password: hashedPassword,
-                account: {
-                    create: {
-                        type: 'credentials',
-                        provider: 'credentials',
-                        providerAccountId: body.email,
-                        subscribed: false
-                    }
-                }
             }
         })
 

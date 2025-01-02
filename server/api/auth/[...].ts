@@ -31,7 +31,6 @@ export default NuxtAuthHandler({
         session: async ({ session, token }) => {
             const user = await getUser(session);
             (session as any).user.id = token.sub;
-            (session as any).subscribed = user?.subscribed;
             return Promise.resolve(session);
         },
         jwt: async ({ token, user }) => {
