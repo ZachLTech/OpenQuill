@@ -1,0 +1,50 @@
+import { getServerSession } from '#auth'
+
+export default eventHandler(async event => {
+    const body = await readBody(event)
+    const session = await getServerSession(event)
+
+    // Just making sure they're allowed to do this :)
+    if (!session){
+        throw createError({
+            statusCode: 401,
+            statusMessage: 'You are not authorized to call this API.'
+        })
+    }
+
+    const requestUser = await event.context.prisma.user.findUnique({
+        where: {
+            email: body.email
+        }
+    })
+
+    if (!requestUser || requestUser.email != session.user?.email) {
+        throw createError({
+            statusCode: 401,
+            statusMessage: 'You are not authorized to call this API. You are not who you say you are.'
+        })
+    }  else if (requestUser && requestUser.email == session.user.email && !requestUser.admin) {
+        throw createError({
+            statusCode: 401,
+            statusMessage: 'You are not authorized to call this API. You are not an admin.'
+        })
+    }
+
+    // Ok by this point they are in fact the user they said they are AND they're an admin.
+    const allUsers = await event.context.prisma.user.findMany({
+        select: {
+            id: true,
+            admin: true,
+            frozen: true,
+            name: true,
+            email: true,
+            password: false,
+            image: false,
+            createdAt: true,
+            updatedAt: true,
+            blog: true
+        }
+    })
+
+    return allUsers
+})

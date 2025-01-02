@@ -12,7 +12,6 @@ export default defineEventHandler(async (event) => {
             })
         }
 
-        // Check if user exists
         const exists = await event.context.prisma.user.findUnique({
             where: { email: body.email }
         })
@@ -24,13 +23,11 @@ export default defineEventHandler(async (event) => {
             })
         }
 
-        // See if there are 0 users
         const usrCount = await event.context.prisma.user.count()
         if (usrCount == 0) {
             admin = true;
         }
 
-        // Create new user
         const hashedPassword = await hash(body.password, 10)
         const user = await event.context.prisma.user.create({
             data: {
