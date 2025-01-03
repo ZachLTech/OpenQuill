@@ -24,7 +24,7 @@ model User {
 model Blog {
   id          String   @id @default(cuid())
   ownerId     String   @unique
-  title       String
+  title       String   @unique
   description String?
   imageURL    String?
   tags        String[]

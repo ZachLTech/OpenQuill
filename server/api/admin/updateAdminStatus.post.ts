@@ -1,5 +1,15 @@
 import { getServerSession } from '#auth'
 
+/* 
+Body Structure:
+{
+    email: <requester email>
+    userToUpdate: {
+        email: <email of user being altered>
+    }
+}
+*/
+
 export default eventHandler(async event => {
     const body = await readBody(event)
     const session = await getServerSession(event)

@@ -29,7 +29,7 @@ export default NuxtAuthHandler({
     adapter: PrismaAdapter(prisma),
     callbacks: {
         session: async ({ session, token }) => {
-            const user = await getUser(session);
+            // const user = await getUser(session);
             (session as any).user.id = token.sub;
             return Promise.resolve(session);
         },

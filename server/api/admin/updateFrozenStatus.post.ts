@@ -4,6 +4,9 @@ import { getServerSession } from '#auth'
 Body Structure:
 {
     email: <requester email>
+    userToUpdate: {
+        email: <email of user being altered>
+    }
 }
 */
 
@@ -38,20 +41,34 @@ export default eventHandler(async event => {
     }
 
     // Ok by this point they are in fact the user they said they are AND they're an admin.
-    const allUsers = await event.context.prisma.user.findMany({
-        select: {
-            id: true,
-            admin: true,
-            frozen: true,
-            name: true,
-            email: true,
-            password: false,
-            image: false,
-            createdAt: true,
-            updatedAt: true,
-            blog: true
+    const userToUpdate = await event.context.prisma.user.findUnique({
+        where: {
+            email: body.userToUpdate.email
         }
     })
 
-    return allUsers
+    if (userToUpdate && userToUpdate.frozen) {
+        await event.context.prisma.user.update({
+            where: {
+                email: body.userToUpdate.email
+            },
+            data: {
+                frozen: false
+            }
+        })
+    } else if (userToUpdate && !userToUpdate.frozen) {
+        await event.context.prisma.user.update({
+            where: {
+                email: body.userToUpdate.email
+            },
+            data: {
+                frozen: true
+            }
+        })
+    } else {
+        throw createError({
+            statusCode: 422,
+            statusMessage: 'The user data you\'re trying to alter doesn\'t exist.'
+        })
+    }
 })
