@@ -4,13 +4,10 @@ import { Blog } from '@prisma/client'
 /* 
 Body Structure:
 {
-    email: <requester email>
-    blogUpdates: {
-        blogTitle: '',
-        blogDescription: '',
-        blogImage: '',
-        blogTags: ['']
-    }
+    blogTitle: '',
+    blogDescription: '',
+    blogImage: '',
+    blogTags: ['']
 }
 */
 
@@ -27,43 +24,44 @@ export default eventHandler(async event => {
         })
     }
 
-    const requestUser = await event.context.prisma.user.findUnique({
+    const userEmail = session.user?.email
+    const user = await event.context.prisma.user.findUnique({
         where: {
-            email: body.email
+            email: (userEmail as string | undefined)
         },
         include: {
             blog: true
         }
     })
 
-    if (!requestUser || requestUser.email != session.user?.email) {
+    if (!user) {
         throw createError({
             statusCode: 401,
-            statusMessage: 'You are not authorized to call this API. You are not who you say you are.'
+            statusMessage: 'The user attached to this session doesn\'t exist.'
         })
-    } 
+    }
 
     const updateData: BlogUpdateInput = {}
 
-    if (body.blogUpdates.blogTitle != undefined && body.blogUpdates.blogTitle != requestUser.blog?.title) {
-        updateData.title = body.blogUpdates.blogTitle
+    if (body.blogTitle != undefined && body.blogTitle != user.blog?.title) {
+        updateData.title = body.blogTitle
     }
     
-    if (body.blogUpdates.blogDescription != undefined && body.blogUpdates.blogDescription != requestUser.blog?.description) {
-        updateData.description = body.blogUpdates.blogDescription
+    if (body.blogDescription != undefined && body.blogDescription != user.blog?.description) {
+        updateData.description = body.blogDescription
     }
     
-    if (body.blogUpdates.blogImage != undefined && body.blogUpdates.blogImage != requestUser.blog?.imageURL) {
-        updateData.imageURL = body.blogUpdates.blogImage
+    if (body.blogImage != undefined && body.blogImage != user.blog?.imageURL) {
+        updateData.imageURL = body.blogImage
     }
     
-    if (body.blogUpdates.blogTags && body.blogUpdates.blogTags != requestUser.blog?.tags) {
-        updateData.tags = body.blogUpdates.blogTags
+    if (body.blogTags && body.blogTags != user.blog?.tags) {
+        updateData.tags = body.blogTags
     }
 
     const updatedBlog = await event.context.prisma.blog.update({
         where: {
-            title: requestUser.blog?.title
+            title: user.blog?.title
         },
         data: updateData
     })

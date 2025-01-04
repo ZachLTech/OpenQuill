@@ -6,6 +6,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     authSecret: process.env.AUTH_SECRET,
+    allowSignups: process.env.ALLOW_SIGNUPS,
     // APIRouteSecret: process.env.API_ROUTE_SECRET,
     public: {
       baseURL: process.env.BASE_URL || `http://localhost:${process.env.PORT}`

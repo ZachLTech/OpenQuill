@@ -3,7 +3,6 @@ import { getServerSession } from '#auth'
 /* 
 Body Structure:
 {
-    email: <requester email>
     blogTitle:
 }
 */
@@ -25,9 +24,10 @@ export default eventHandler(async event => {
         })
     }
 
+    const userEmail = session.user?.email
     const user = await event.context.prisma.user.findUnique({
         where: {
-            email: body.email
+            email: (userEmail as string | undefined)
         },
         include: {
             blog: true
@@ -39,7 +39,7 @@ export default eventHandler(async event => {
             statusCode: 422,
             statusMessage: 'Error creating blog, this user doesn\'t exist.'
         })
-    } else if (user && user.blog != null) {
+    } else if (user && user.blog) {
         throw createError({
             statusCode: 422,
             statusMessage: 'Error creating blog, this user already has a blog.'

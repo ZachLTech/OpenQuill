@@ -15,6 +15,7 @@ model User {
   email    String   @unique
   password String?
   image    String?
+  website  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   blog     Blog?
@@ -41,7 +42,7 @@ model Post {
   title   String
   heroImg String?
   summary String?
-  content String @db.Text
+  content String? @db.Text
   tags    String[]
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

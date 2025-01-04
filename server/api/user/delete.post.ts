@@ -11,7 +11,6 @@ export default eventHandler(async event => {
     }
 
     const userEmail = session.user?.email
-
     await event.context.prisma.user.delete({
         where: {
             email: (userEmail as string | undefined),

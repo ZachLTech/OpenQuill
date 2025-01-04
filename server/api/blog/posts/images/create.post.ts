@@ -3,7 +3,8 @@ import { getServerSession } from '#auth'
 /* 
 Body Structure:
 {
-    title: '',
+    postId: '',
+    image: ''
 }
 */
 
@@ -24,7 +25,20 @@ export default eventHandler(async event => {
             email: (userEmail as string | undefined)
         },
         include: {
-            blog: true
+            posts: true
+        }
+    })
+
+    const post = await event.context.prisma.post.findUnique({
+        where: {
+            id: body.postId
+        },
+        include: {
+            owner: {
+                select: {
+                    id: true
+                }
+            }
         }
     })
 
@@ -33,27 +47,24 @@ export default eventHandler(async event => {
             statusCode: 401,
             statusMessage: 'The user attached to this session doesn\'t exist.'
         })
-    } else if (!user.blog) {
+    } else if (!post) {
         throw createError({
             statusCode: 401,
-            statusMessage: 'The user attached to this session doesn\'t have a blog.'
+            statusMessage: 'The user attached to this session doesn\'t have a post with that ID.'
+        })
+    } else if (user.id != post.owner.id) {
+        throw createError({
+            statusCode: 401,
+            statusMessage: 'The post being accessed doesn\'t belong to the user attached to this session.'
         })
     }
-    
-    if (!body.title) {
-        const now = new Date()
-        const date = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`
-        const time = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`
-        body.title = `${date} - ${time}`
-    }
 
-    const newPost = await event.context.prisma.post.create({
+    const newImage = await event.context.prisma.image.create({
         data: {
-            ownerId: user.id,
-            blogId: user.blog.id,
-            title: body.title,
+            postId: body.postId,
+            image: body.image
         }
     })
 
-    return newPost
+    return newImage
 })
