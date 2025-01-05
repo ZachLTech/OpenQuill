@@ -59,6 +59,25 @@
         navigateTo(`/${blog.value?.title}/${newPost.id}-edit`);
     }
 
+    async function deletePost(post: Post) {
+        try {
+            await $fetch('/api/blog/posts/delete', {
+                method: 'POST',
+                body: {
+                    post: post
+                }
+            })
+        } catch(e: any) {
+            error.value = 'Something went wrong... Failed to delete post.'
+            console.error(e)
+        } finally {
+            const indexOfPost = posts.value.indexOf(post);
+            if (indexOfPost > -1) {
+                posts.value.splice(indexOfPost, 1)
+            }
+        }
+    }
+
     onMounted(async () => {
         try {
             loading.value = true
@@ -147,6 +166,7 @@
                         <p v-if="post.summary">{{ post.summary }}</p>
                         <NuxtLink :to="`/${blog.title}/${post.id}`">View Post</NuxtLink>
                         <NuxtLink v-if="(currentSessionUser as User).id == blog?.ownerId" :to="`/${blog.title}/${post.id}-edit`">Edit Post</NuxtLink>
+                        <button v-if="(currentSessionUser as User).id == blog?.ownerId" @click="deletePost(post)">Delete Post</button>
                     </div>
                 </div>
                 <div v-if="post.published">
@@ -155,7 +175,7 @@
                     <NuxtLink :to="`/${blog.title}/${post.id}`">View Post</NuxtLink>
                     <div v-if="status==='authenticated'">
                         <NuxtLink v-if="(currentSessionUser as User).id == blog?.ownerId" :to="`/${blog.title}/${post.id}-edit`">Edit Post</NuxtLink>
-                        <!-- TODO: Delete post button -->
+                        <button v-if="(currentSessionUser as User).id == blog?.ownerId" @click="deletePost(post)">Delete Post</button>
                     </div>
                 </div>
                 <div v-else>

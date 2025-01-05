@@ -15,6 +15,7 @@ export default eventHandler(async event => {
         take: body.pageSize,
         select: {
             id: true,
+            ownerId: true,
             title: true,
             summary: true,
             tags: true,

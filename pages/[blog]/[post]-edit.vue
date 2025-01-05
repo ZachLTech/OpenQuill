@@ -26,7 +26,7 @@
     const newAltText = ref<string | null>('')
     const hasChanges = ref(false)
     const currentSessionUser = data.value?.user
-    const autoSaveEnabled = ref(localStorage.getItem('autoSaveEnabled') !== 'false')
+    const autoSaveEnabled = ref(true)
     const postInput = ref({
         postId: route.params.post as string,
         title: '',
@@ -264,9 +264,12 @@
     }
 
     // autosave stuff
+    const isClient = useNuxtApp().$client
     let autoSaveInterval: NodeJS.Timeout
     watch(autoSaveEnabled, (newValue) => {
-        localStorage.setItem('autoSaveEnabled', newValue.toString())
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('autoSaveEnabled', newValue.toString())
+        }
         if (newValue) {
             autoSaveInterval = setInterval(async () => {
                 if (hasChanges.value) {
@@ -279,6 +282,11 @@
     })
 
     onMounted(() => {
+        const savedPreference = localStorage.getItem('autoSaveEnabled')
+        if (savedPreference !== null) {
+            autoSaveEnabled.value = savedPreference === 'true'
+        }
+
         if (autoSaveEnabled.value) {
             autoSaveInterval = setInterval(async () => {
                 if (hasChanges.value) {
