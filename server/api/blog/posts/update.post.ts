@@ -103,6 +103,11 @@ export default eventHandler(async event => {
         updateData.heroImg = body.heroImg
     }
 
+    if (body.summary != undefined && body.summary != post.summary) {
+        checkSize(body.title)
+        updateData.summary = body.summary
+    }
+
     if (body.content != undefined && body.content != post.content) {
         checkSize(body.title)
         updateData.content = body.content

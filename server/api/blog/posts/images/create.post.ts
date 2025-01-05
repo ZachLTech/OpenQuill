@@ -4,7 +4,8 @@ import { getServerSession } from '#auth'
 Body Structure:
 {
     postId: '',
-    image: ''
+    image: '',
+    alt: '' (Optional)
 }
 */
 
@@ -88,7 +89,8 @@ export default eventHandler(async event => {
     const newImage = await event.context.prisma.image.create({
         data: {
             postId: body.postId,
-            image: body.image
+            image: body.image,
+            alt: body.alt ? body.alt : ''
         }
     })
 
