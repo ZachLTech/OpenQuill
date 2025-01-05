@@ -2,7 +2,7 @@
     import type { Blog, Post } from '@prisma/client'
 
     const route = useRoute()
-    const { data } = useAuth()
+    const { data, status } = useAuth()
     let loading = ref(true)
     let error = ref('')
     let blog = ref<Blog | null>(null)
@@ -16,7 +16,7 @@
         email: string,
         name: string
     }
-    let currentSessionUser = ref(data.value?.user)
+    const currentSessionUser = ref<User | undefined>(data.value?.user as User)
 
     async function handleBlogUpdate() {
         try {
@@ -110,18 +110,21 @@
 
     <div v-else-if="blog">
         <!-- Reserved for blog owner -->
-        <div v-if="(currentSessionUser as User).id == blog?.ownerId">
-            <!-- Blog edits -->
-            <button v-if="!isEditing" @click="isEditing = true">Edit Blog</button>
-            <editBlog
-                v-if="isEditing"
-                :blog="blog"
-                @close="isEditing = false"
-                @update="handleBlogUpdate"
-            />
-            <!-- New post stuff -->
-            <button @click="createNewPost">New Post</button>
+        <div v-if="status==='authenticated'">
+            <div v-if="(currentSessionUser as User).id == blog?.ownerId">
+                <!-- Blog edits -->
+                <button v-if="!isEditing" @click="isEditing = true">Edit Blog</button>
+                <editBlog
+                    v-if="isEditing"
+                    :blog="blog"
+                    @close="isEditing = false"
+                    @update="handleBlogUpdate"
+                />
+                <!-- New post stuff -->
+                <button @click="createNewPost">New Post</button>
+            </div>
         </div>
+        
         <!-- skeleton blog details -->
         <h1>{{ blog.title }}</h1>
         <p v-if="blog.description">{{ blog.description }}</p>
@@ -137,12 +140,30 @@
         <div v-if="posts.length > 0">
             <h2>Posts</h2>
             <div v-for="post in posts" :key="post.id">
-                <h3>{{ post.title }}</h3>
-                <p v-if="post.summary">{{ post.summary }}</p>
-                <NuxtLink :to="`/${blog.title}/${post.id}`">Read more</NuxtLink>
+                <div v-if="status==='authenticated'">
+                    <div v-if="!post.published && (currentSessionUser as User).id == blog?.ownerId">
+                        <h3>{{ post.title }}</h3>
+                        <p>NOT PUBLISHED!</p>
+                        <p v-if="post.summary">{{ post.summary }}</p>
+                        <NuxtLink :to="`/${blog.title}/${post.id}`">View Post</NuxtLink>
+                        <NuxtLink v-if="(currentSessionUser as User).id == blog?.ownerId" :to="`/${blog.title}/${post.id}-edit`">Edit Post</NuxtLink>
+                    </div>
+                </div>
+                <div v-if="post.published">
+                    <h3>{{ post.title }}</h3>
+                    <p v-if="post.summary">{{ post.summary }}</p>
+                    <NuxtLink :to="`/${blog.title}/${post.id}`">View Post</NuxtLink>
+                    <div v-if="status==='authenticated'">
+                        <NuxtLink v-if="(currentSessionUser as User).id == blog?.ownerId" :to="`/${blog.title}/${post.id}-edit`">Edit Post</NuxtLink>
+                        <!-- TODO: Delete post button -->
+                    </div>
+                </div>
+                <div v-else>
+                    No posts yet
+                </div>
             </div>
         </div>
-        <div v-else>
+        <div v-else-if="status!=='authenticated'">
             No posts yet
         </div>
     </div>

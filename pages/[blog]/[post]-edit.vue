@@ -7,8 +7,13 @@
         name: string
     }
 
-    const { data } = useAuth()
+    const { status, data } = useAuth()
     const route = useRoute()
+
+    if (status.value != 'authenticated') {
+        navigateTo(`/${route.params.blog}/${route.params.post}`)
+    }
+
     const loading = ref(false)
     const error = ref('')
     const imageError = ref('')
