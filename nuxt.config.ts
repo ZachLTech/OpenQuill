@@ -9,7 +9,8 @@ export default defineNuxtConfig({
     allowSignups: process.env.ALLOW_SIGNUPS,
     // APIRouteSecret: process.env.API_ROUTE_SECRET,
     public: {
-      baseURL: process.env.BASE_URL || `http://localhost:${process.env.PORT}`
+      baseURL: process.env.BASE_URL || `http://localhost:${process.env.PORT}`,
+      firstBlogAutoRedirect: process.env.ENABLE_SINGLE_BLOG_AUTO_REDIRECT
     }
   },
 

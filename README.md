@@ -7,3 +7,5 @@ This is gonna be a simple yet versatile self-hosted blog platform for anyone to 
 
 Things I want to implement eventually:
 - hiding blogs
+
+- change auto redirect when only 1 blog to an admin setting switch
