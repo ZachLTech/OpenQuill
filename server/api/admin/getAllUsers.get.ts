@@ -28,11 +28,12 @@ export default eventHandler(async event => {
         select: {
             id: true,
             admin: true,
+            website: true,
             frozen: true,
             name: true,
             email: true,
             password: false,
-            image: false,
+            image: true,
             createdAt: true,
             updatedAt: true,
             blog: true

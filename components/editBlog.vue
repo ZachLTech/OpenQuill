@@ -112,7 +112,7 @@ async function handleUpdate() {
     <div>
         <h2>Edit Blog</h2>
         
-        <div v-if="error" class="error">{{ error }}</div>
+        <div v-if="error">{{ error }}</div>
 
         <form @submit.prevent="handleUpdate">
             <div>

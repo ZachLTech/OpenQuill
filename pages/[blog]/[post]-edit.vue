@@ -349,7 +349,7 @@
     <div>
         <tempNav />
         
-        <div v-if="error" class="error">{{ error }}</div>
+        <div v-if="error">{{ error }}</div>
         
         <form @submit.prevent="savePost" v-if="post">
             <div>
@@ -365,7 +365,7 @@
                     accept="image/*"
                     @change="handleThumbnailUpload"
                 />
-                <div v-if="imageError" class="error">{{ imageError }}</div>
+                <div v-if="imageError">{{ imageError }}</div>
             </div>
            
             <div>
@@ -399,11 +399,11 @@
                     accept="image/*"
                     @change="handleImageUpload"
                 />
-                <div v-if="imageError" class="error">{{ imageError }}</div>
+                <div v-if="imageError">{{ imageError }}</div>
             </div>
 
-            <div v-if="showAltModal" class="modal">
-                <div class="modal-content">
+            <div v-if="showAltModal">
+                <div>
                     <h3>Add Alt Text</h3>
                     <img 
                         v-if="pendingImage" 
@@ -417,7 +417,7 @@
                         placeholder="Describe this image (required)"
                         required
                     />
-                    <div class="button-group">
+                    <div>
                         <button @click="showAltModal = false">Cancel</button>
                         <button 
                             @click="confirmImageUpload"
@@ -429,8 +429,8 @@
                 </div>
             </div>
 
-            <div class="image-gallery">
-                <div v-for="img in images" :key="img.id" class="image-preview">
+            <div>
+                <div v-for="img in images" :key="img.id">
                     <img :src="img.image" :alt="img.alt || ''" width="200" />
                     <div>Marker: [image:{{ img.id }}:"{{ img.alt }}"]</div>
                     
@@ -457,7 +457,7 @@
             </div>
 
             <!-- autosave toggle wooh -->
-            <div class="auto-save-toggle">
+            <div>
                 <label>
                     <input 
                         type="checkbox"

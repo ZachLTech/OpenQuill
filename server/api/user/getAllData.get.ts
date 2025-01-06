@@ -21,6 +21,7 @@ export default eventHandler(async event => {
             frozen: true,
             name: true,
             email: true,
+            website: true,
             image: true,
             createdAt: true,
             updatedAt: true,
