@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { User } from '@prisma/client'
 
-const { data, status, signOut } = useAuth()
+const { status, signOut } = useAuth()
 const loading = ref(false)
 const error = ref('')
 const hasChanges = ref(false)
@@ -175,9 +175,9 @@ if (status.value === 'unauthenticated') {
 
         <div>
             <h2>Danger Zone</h2>
-            <button @click="wantsToDeleteAccount = true">Delete Account</button>
+            <button @click="wantsToDeleteAccount=true">Delete Account</button>
             
-            <div v-if="wantsToDeleteAccount"">
+            <div v-if="wantsToDeleteAccount">
                 <p>Are you sure you want to delete your account?</p>
                 <button @click="deleteAccount()">Yes, Delete</button>
                 <button @click="wantsToDeleteAccount = false">Cancel</button>
