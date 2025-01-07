@@ -82,6 +82,13 @@ async function handleUpdate() {
         loading.value = true
         error.value = ''
 
+        const currentUser = await $fetch('/api/user/getAllData')
+
+        if (currentUser && currentUser.frozen) {
+            error.value = 'You can\'t do this. Your account is currently frozen.'
+            return
+        }
+
         blogInput.value.blogTitle = blogInput.value.blogTitle.trim()
         blogInput.value.blogDescription = blogInput.value.blogDescription.trim()
         blogInput.value.blogImage = blogInput.value.blogImage.trim()

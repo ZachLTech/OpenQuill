@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import type { Post, Image } from '@prisma/client'
+    import type { Post, Image, User as FullUser } from '@prisma/client'
 
     type User = {
         id: string,
@@ -27,6 +27,7 @@
     const hasChanges = ref(false)
     const currentSessionUser = data.value?.user
     const autoSaveEnabled = ref(true)
+    let currentUserFull: FullUser
     const postInput = ref({
         postId: route.params.post as string,
         title: '',
@@ -108,6 +109,11 @@
             return
         }
 
+        if (currentUserFull && currentUserFull.frozen) {
+            error.value = 'You can\'t do this. Your account is currently frozen.'
+            return
+        }
+
         try {
             const newImage = await $fetch('/api/blog/posts/images/create', {
                 method: 'POST',
@@ -159,6 +165,11 @@
 
     async function updateAltText(imageId: string, newAlt: string | null) {
         try {
+
+            if (currentUserFull && currentUserFull.frozen) {
+                error.value = 'You can\'t do this. Your account is currently frozen.'
+                return
+            }
             
             // Update in database
             await $fetch('/api/blog/posts/images/update', {
@@ -230,6 +241,11 @@
             loading.value = true
             error.value = ''
 
+            if (currentUserFull && currentUserFull.frozen) {
+                error.value = 'You can\'t do this. Your account is currently frozen.'
+                return
+            }
+
             postInput.value.title = postInput.value.title.trim()
             postInput.value.heroImg = postInput.value.heroImg.trim()
             postInput.value.summary = postInput.value.summary.trim()
@@ -264,7 +280,6 @@
     }
 
     // autosave stuff
-    const isClient = useNuxtApp().$client
     let autoSaveInterval: NodeJS.Timeout
     watch(autoSaveEnabled, (newValue) => {
         if (typeof window !== 'undefined') {
@@ -342,6 +357,8 @@
                 published: thisPost.published
             }
         }
+
+        currentUserFull = await $fetch<FullUser>('/api/user/getAllData')
     })
 </script>
 

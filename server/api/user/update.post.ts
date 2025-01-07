@@ -32,6 +32,13 @@ export default eventHandler(async event => {
             email: (userEmail as string | undefined)
         },
     })
+    
+    if (user && user.frozen) {
+        throw createError({
+            statusCode: 401,
+            statusMessage: 'You are not authorized to call this API. You account is frozen.'
+        })
+    }
 
     const updateData: UserUpdateInput = {}
 

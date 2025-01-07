@@ -41,6 +41,11 @@ async function updateProfile() {
         loading.value = true
         error.value = ''
 
+        if (currentUser.value && currentUser.value.frozen) {
+            error.value = 'You can\'t do this. Your account is currently frozen.'
+            return
+        }
+
         const updatedUser = await $fetch('/api/user/update', {
             method: 'POST',
             body: userInput.value

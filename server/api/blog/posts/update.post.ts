@@ -61,6 +61,13 @@ export default eventHandler(async event => {
         }
     })
 
+    if (user && user.frozen) {
+        throw createError({
+            statusCode: 401,
+            statusMessage: 'You are not authorized to call this API. You account is frozen.'
+        })
+    }
+
     const post = await event.context.prisma.post.findUnique({
         where: {
             id: body.postId

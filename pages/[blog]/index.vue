@@ -21,6 +21,14 @@
     async function handleBlogUpdate() {
         try {
             loading.value = true
+            
+            const currentUser = await $fetch('/api/user/getAllData')
+            
+            if (currentUser && currentUser.frozen) {
+                error.value = 'You can\'t do this. Your account is currently frozen.'
+                return
+            }
+
             const blogData = await $fetch('/api/blog/getData', {
                 method: 'POST',
                 body: {
@@ -50,6 +58,13 @@
     }
 
     async function createNewPost() {
+        const currentUser = await $fetch('/api/user/getAllData')
+
+        if (currentUser && currentUser.frozen) {
+            error.value = 'You can\'t do this. Your account is currently frozen.'
+            return
+        }
+
         const newPost = await $fetch('/api/blog/posts/create', {
             method: 'POST',
             body: {
@@ -125,9 +140,9 @@
 
     <div v-if="loading">Loading blog...</div>
 
-    <div v-else-if="error">{{ error }}</div>
+    <div v-if="error">{{ error }}</div>
 
-    <div v-else-if="blog">
+    <div v-if="blog">
         <!-- Reserved for blog owner -->
         <div v-if="status==='authenticated'">
             <div v-if="(currentSessionUser as User).id == blog?.ownerId">
