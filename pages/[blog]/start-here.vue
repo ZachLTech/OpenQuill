@@ -104,12 +104,12 @@
                 return
             }
 
-            const { data } = await useFetch('/api/blog/update', {
+            const data = await $fetch('/api/blog/update', {
                 method: 'POST',
                 body: blogInput.value
             })
 
-            if (data.value) {
+            if (data) {
                 initializing.value = false
             }
         } catch (e: any) {

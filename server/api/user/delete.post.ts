@@ -10,10 +10,30 @@ export default eventHandler(async event => {
         })
     }
 
-    const userEmail = session.user?.email
+    const userEmail = session.user?.email as string | undefined
+
+    const isAdmin = await event.context.prisma.user.findUnique({
+        where: { email: userEmail },
+        select: { admin: true }
+    })
+
+
+    if (isAdmin?.admin) {
+        const adminCount = await event.context.prisma.user.count({
+            where: { admin: true }
+        })
+        if (adminCount <= 1) {
+            throw createError({
+                statusCode: 400,
+                statusMessage: 'Cannot delete the last admin user.'
+            })
+        }
+    }
+
+    
     await event.context.prisma.user.delete({
         where: {
-            email: (userEmail as string | undefined),
+            email: userEmail,
         }
     })
 })

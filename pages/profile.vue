@@ -17,13 +17,25 @@ const userInput = ref({
 })
 
 async function deleteAccount() {
-    if (wantsToDeleteAccount) {
-      await $fetch('/api/DeleteAccount', {
-        method: 'POST'
-      })
-      signOut()
+    const admins = await $fetch('/api/user/getAdminData')
+    loading.value = true
+
+    if (wantsToDeleteAccount && !currentUser.value?.admin) {
+        await $fetch('/api/user/delete', {
+            method: 'POST'
+        })
+        signOut()
+    } else if (wantsToDeleteAccount && admins.length>1) {
+        await $fetch('/api/user/delete', {
+            method: 'POST'
+        })
+        signOut()
+    } else {
+        error.value = 'You cannot delete your account if you\'re the only admin.'
+        wantsToDeleteAccount.value = false
+        loading.value = false
     }
-  }
+}
 
 watch(userInput, (newVal) => {
     if (!currentUser.value) return

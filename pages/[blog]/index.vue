@@ -10,6 +10,7 @@
     let postsPerPage = 5
     let currentPage = ref(1)
     let isEditing = ref(false)
+    let blogInitialized = ref(true)
 
     type User = {
         id: string,
@@ -108,6 +109,9 @@
                     createdAt: new Date(blogData.createdAt),
                     updatedAt: new Date(blogData.updatedAt)
                 }
+                if (!blogData.description && !blogData.imageURL && blogData.tags.length<1) {
+                    blogInitialized.value = false
+                }
             }
 
             if (!blog.value) {
@@ -147,7 +151,8 @@
         <div v-if="status==='authenticated'">
             <div v-if="(currentSessionUser as User).id == blog?.ownerId">
                 <!-- Blog edits -->
-                <button v-if="!isEditing" @click="isEditing = true">Edit Blog</button>
+                <NuxtLink v-if="!blogInitialized" :to='`/${blog.title}/start-here`'>Customize your new blog!</NuxtLink>
+                <button v-if="!isEditing && blogInitialized" @click="isEditing = true">Edit Blog</button>
                 <editBlog
                     v-if="isEditing"
                     :blog="blog"

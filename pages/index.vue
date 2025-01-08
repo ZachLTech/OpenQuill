@@ -4,6 +4,7 @@
     const { status, signOut } = useAuth()
     const autoRedirectSingleBlog = useRuntimeConfig().public.firstBlogAutoRedirect
     const loading = ref(true)
+    const instanceInitialized = ref(false)
     const error = ref('')
     let blogs = ref<Blog[]>()
     
@@ -11,7 +12,11 @@
         try {
             loading.value = true
             const allBlogs = await $fetch<Blog[]>('/api/blog/getAllBlogs')
+            const admins = await $fetch('/api/user/getAdminData')
             blogs.value = allBlogs
+            if (admins) {
+                instanceInitialized.value = true
+            }
 
             if (blogs.value[0] && !blogs.value[1] && (autoRedirectSingleBlog === 'true' || autoRedirectSingleBlog === 'True')) {
                 navigateTo(`/${blogs.value[0].title}`);
@@ -47,9 +52,12 @@
     </div>
 
     <div v-else>
-        <div v-if="blogs?.length <= 0 || blogs == null">
+        <div v-if="blogs?.length <= 0 || blogs == null && !instanceInitialized">
             <p>There aren't any blogs, this must be a new instance. Since this is the first signup, this user will be the blog admin.</p>
             <signupForm />
+        </div>
+        <div v-else-if="blogs?.length <= 0 || blogs == null && instanceInitialized">
+            <p>There aren't any blogs right now.</p>
         </div>
         <div v-else>
             Blog List:

@@ -97,12 +97,12 @@ async function handleUpdate() {
         error.value = await validateInput(blogInput.value)
         if (error.value) return
 
-        const { data } = await useFetch('/api/blog/update', {
+        const data = await $fetch('/api/blog/update', {
             method: 'POST',
             body: blogInput.value
         })
 
-        if (data.value) {
+        if (data) {
             emit('update')
             emit('close')
         }

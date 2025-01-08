@@ -90,11 +90,6 @@ async function toggleAdminStatus(user: User) {
 
 async function toggleFrozenStatus(user: User) {
     try {
-        if (user.email === currentUser.value?.email) {
-            error.value = "You cannot freeze your own account"
-            return
-        }
-
         await $fetch('/api/admin/updateFrozenStatus', {
             method: 'POST',
             body: {
@@ -157,7 +152,6 @@ async function toggleFrozenStatus(user: User) {
                             </button>
                             <button 
                                 @click="toggleFrozenStatus(user)"
-                                :disabled="user.email === currentUser?.email"
                             >
                                 {{ user.frozen ? 'Unfreeze' : 'Freeze' }}
                             </button>
