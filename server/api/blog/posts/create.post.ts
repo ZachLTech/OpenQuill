@@ -1,10 +1,10 @@
 import { getServerSession } from '#auth'
 
 /* 
-Body Structure:
-{
-    title: '',
-}
+    Body Structure:
+    {
+        title: '',
+    }
 */
 
 function checkSize(input: any) {

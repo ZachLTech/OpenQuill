@@ -2,13 +2,13 @@ import { getServerSession } from '#auth'
 import { Blog } from '@prisma/client'
 
 /* 
-Body Structure:
-{
-    blogTitle: '',
-    blogDescription: '',
-    blogImage: '',
-    blogTags: ['']
-}
+    Body Structure:
+    {
+        blogTitle: '',
+        blogDescription: '',
+        blogImage: '',
+        blogTags: ['']
+    }
 */
 
 type BlogUpdateInput = Partial<Pick<Blog, 'title' | 'description' | 'imageURL' | 'tags'>>

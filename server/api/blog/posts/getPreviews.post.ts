@@ -1,10 +1,10 @@
 /* 
-Body Structure:
-{
-    page: number,
-    pageSize: number,
-    blog: blogTitle
-}
+    Body Structure:
+    {
+        page: number,
+        pageSize: number,
+        blog: blogTitle
+    }
 */
 
 export default eventHandler(async event => {

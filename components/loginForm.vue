@@ -1,37 +1,37 @@
 <script setup lang="ts">
-const login = ref({ email: '', password: '' })
-const loading = ref(false)
-const error = ref('')
-const { signIn } = useAuth()
+    // All initial logic declarations
+    const login = ref({ email: '', password: '' })
+    const loading = ref(false)
+    const error = ref('')
+    const { signIn } = useAuth()
+    // Form handling
+    async function handleLogin() {
+        try {
+            loading.value = true
+            error.value = ''
+            
+            login.value.email = login.value.email.trim().toLowerCase()
 
-
-async function handleLogin() {
-    try {
-        loading.value = true
-        error.value = ''
-        
-        login.value.email = login.value.email.trim().toLowerCase()
-
-        const result = await signIn('credentials', {
-            email: login.value.email,
-            password: login.value.password,
-            redirect: false,
-            callbackUrl: '/profile'
-        })
-        
-        if (result?.error) {
-            error.value = 'Invalid credentials'
-            console.error('Login failed:', result.error)
-        } else {
-            navigateTo('/profile')
+            const result = await signIn('credentials', {
+                email: login.value.email,
+                password: login.value.password,
+                redirect: false,
+                callbackUrl: '/profile'
+            })
+            
+            if (result?.error) {
+                error.value = 'Invalid credentials'
+                console.error('Login failed:', result.error)
+            } else {
+                navigateTo('/profile')
+            }
+        } catch (e: any) {
+            error.value = e?.message || 'Login failed'
+            console.error('Login error:', e)
+        } finally {
+            loading.value = false
         }
-    } catch (e: any) {
-        error.value = e?.message || 'Login failed'
-        console.error('Login error:', e)
-    } finally {
-        loading.value = false
     }
-}
 </script>
 
 <template>

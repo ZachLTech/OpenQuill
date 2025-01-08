@@ -1,10 +1,10 @@
 import { getServerSession } from '#auth'
 
 /* 
-Body Structure:
-{
-    blogTitle:
-}
+    Body Structure:
+    {
+        blogTitle:
+    }
 */
 
 type User = {

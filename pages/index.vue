@@ -1,13 +1,14 @@
 <script setup lang="ts">
+    // Types
     import type { Blog } from '@prisma/client'
-
+    // All initial logic declarations
     const { status, signOut } = useAuth()
     const autoRedirectSingleBlog = useRuntimeConfig().public.firstBlogAutoRedirect
     const loading = ref(true)
     const instanceInitialized = ref(false)
     const error = ref('')
     let blogs = ref<Blog[]>()
-    
+    // Runs this as soon as the page is mounted - gets all blogs and navigates to single blog if there's only one and .env option is enabled to do so
     onMounted(async () => {
         try {
             loading.value = true

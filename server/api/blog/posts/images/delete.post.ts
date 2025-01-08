@@ -1,10 +1,10 @@
 import { getServerSession } from '#auth'
 
 /* 
-Body Structure:
-{
-    imageId: ''
-}
+    Body Structure:
+    {
+        imageId: ''
+    }
 */
 
 export default eventHandler(async event => {

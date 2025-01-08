@@ -1,8 +1,15 @@
 <script setup lang="ts">
+    // Types
     import type { Blog, Post } from '@prisma/client'
-
+    type User = {
+        id: string,
+        email: string,
+        name: string
+    }
+    // All initial logic declarations
     const route = useRoute()
     const { data, status } = useAuth()
+    const currentSessionUser = ref<User | undefined>(data.value?.user as User)
     let loading = ref(true)
     let error = ref('')
     let blog = ref<Blog | null>(null)
@@ -11,14 +18,61 @@
     let currentPage = ref(1)
     let isEditing = ref(false)
     let blogInitialized = ref(true)
+    // Runs this as soon as the page is mounted - gets blog data
+    onMounted(async () => {
+        try {
+            loading.value = true
+            const blogData = await $fetch('/api/blog/getData', {
+                method: 'POST',
+                body: {
+                    blogTitle: route.params.blog
+                }
+            })
+            if (blogData) {
+                blog.value = {
+                    ...blogData,
+                    createdAt: new Date(blogData.createdAt),
+                    updatedAt: new Date(blogData.updatedAt)
+                }
+                if (!blogData.description && !blogData.imageURL && blogData.tags.length<1) {
+                    blogInitialized.value = false
+                }
+            }
 
-    type User = {
-        id: string,
-        email: string,
-        name: string
-    }
-    const currentSessionUser = ref<User | undefined>(data.value?.user as User)
+            if (!blog.value) {
+                error.value = 'Blog not found'
+                return
+            }
 
+            const postsData = await $fetch('/api/blog/posts/getPreviews', {
+                method: 'POST',
+                body: {
+                    page: currentPage.value,
+                    pageSize: postsPerPage,
+                    blogId: blog.value.id
+                }
+            })
+            
+            posts.value = (() => {
+                let postsDataReformatted: Post[] = []
+
+                for (let i=0;i<postsData.length;i++) {
+                    postsData.push({
+                        ...postsData[i]
+                    })
+                }
+
+                return postsDataReformatted
+            })()
+
+        } catch (e: any) {
+            error.value = 'Error loading blog'
+            console.error('Blog loading error:', e)
+        } finally {
+            loading.value = false
+        }
+    })
+    // The next few functions are literally either helpers or form submission stuff
     async function handleBlogUpdate() {
         try {
             loading.value = true
@@ -57,7 +111,7 @@
             loading.value = false
         }
     }
-
+    // Changes DB
     async function createNewPost() {
         const currentUser = await $fetch('/api/user/getAllData')
 
@@ -74,7 +128,7 @@
         });
         navigateTo(`/${blog.value?.title}/${newPost.id}-edit`);
     }
-
+    // Changes DB
     async function deletePost(post: Post) {
         try {
             await $fetch('/api/blog/posts/delete', {
@@ -93,50 +147,6 @@
             }
         }
     }
-
-    onMounted(async () => {
-        try {
-            loading.value = true
-            const blogData = await $fetch('/api/blog/getData', {
-                method: 'POST',
-                body: {
-                    blogTitle: route.params.blog
-                }
-            })
-            if (blogData) {
-                blog.value = {
-                    ...blogData,
-                    createdAt: new Date(blogData.createdAt),
-                    updatedAt: new Date(blogData.updatedAt)
-                }
-                if (!blogData.description && !blogData.imageURL && blogData.tags.length<1) {
-                    blogInitialized.value = false
-                }
-            }
-
-            if (!blog.value) {
-                error.value = 'Blog not found'
-                return
-            }
-
-            const postsData = await $fetch('/api/blog/posts/getPreviews', {
-                method: 'POST',
-                body: {
-                    page: currentPage.value,
-                    pageSize: postsPerPage,
-                    blogId: blog.value.id
-                }
-            })
-            // @ts-ignore
-            posts.value = postsData
-
-        } catch (e: any) {
-            error.value = 'Error loading blog'
-            console.error('Blog loading error:', e)
-        } finally {
-            loading.value = false
-        }
-    })
 </script>
 
 <template>
@@ -153,7 +163,7 @@
                 <!-- Blog edits -->
                 <NuxtLink v-if="!blogInitialized" :to='`/${blog.title}/start-here`'>Customize your new blog!</NuxtLink>
                 <button v-if="!isEditing && blogInitialized" @click="isEditing = true">Edit Blog</button>
-                <editBlog
+                <editBlogForm
                     v-if="isEditing"
                     :blog="blog"
                     @close="isEditing = false"

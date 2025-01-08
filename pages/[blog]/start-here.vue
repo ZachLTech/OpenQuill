@@ -1,29 +1,61 @@
 <script setup lang="ts">
-    const { status, data } = useAuth()
-
-    if (status.value === 'unauthenticated') {
-        navigateTo('/login');
-    }
-
-    const route = useRoute()
-    const loading = ref(true)
-    const error = ref('')
-    const initializing = ref(true)
-    const blogInput = ref({
-        blogTitle: route.params.blog as string,
-        blogDescription: '',
-        blogImage: '',
-        blogTags: [] as string[]
-    })
-    
+    // Types
     type User = {
         name: string,
         email: string,
         image: string,
         id: string
     }
+    // All initial logic declarations
+    const { status, data } = useAuth()
+    const route = useRoute()
+    const loading = ref(true)
+    const error = ref('')
+    const initializing = ref(true)
     const thisUserData = data.value?.user
+    const blogInput = ref({
+        blogTitle: route.params.blog as string,
+        blogDescription: '',
+        blogImage: '',
+        blogTags: [] as string[]
+    })
+    // If the user isn't even authenticated then they getting booted straight back to login
+    if (status.value === 'unauthenticated') {
+        navigateTo('/login');
+    }
+    // Runs this as soon as the page is mounted - gets blog data  and makes sure it's not already initialized nor is the person trying to access it unauthorized
+    onMounted(async () => {
+        try {
+            loading.value = true
+            const blogData = await $fetch('/api/blog/getData', {
+                method: 'POST',
+                body: {
+                    blogTitle: route.params.blog
+                }
+            })
 
+            if (!blogData) {
+                navigateTo('/')
+                return
+            } else if ((thisUserData as User).id != blogData.ownerId) {
+                navigateTo(`/${blogData.title}`)
+                return
+            }
+
+            if (blogData.description || blogData.imageURL || blogData.tags?.length > 0) {
+                navigateTo(`/${blogData.title}`)
+                return
+            }
+
+            initializing.value = true
+        } catch (e: any) {
+            error.value = e?.response?._data?.message || 'Failed to load blog'
+            console.error('Blog loading error:', e)
+        } finally {
+            loading.value = false
+        }
+    })
+    // Helper functions and form handling stuff
     function checkSize(input: any, inputName: string, size: number) {
         if (input) {
             try {
@@ -86,7 +118,7 @@
         }
         reader.readAsDataURL(file)
     }
-
+    // Changes DB
     async function handleInitialize() {
         try {
             loading.value = true
@@ -119,84 +151,50 @@
             loading.value = false
         }
     }
-
-    onMounted(async () => {
-        try {
-            loading.value = true
-            const blogData = await $fetch('/api/blog/getData', {
-                method: 'POST',
-                body: {
-                    blogTitle: route.params.blog
-                }
-            })
-
-            if (!blogData) {
-                navigateTo('/')
-                return
-            } else if ((thisUserData as User).id != blogData.ownerId) {
-                navigateTo(`/${blogData.title}`)
-                return
-            }
-
-            if (blogData.description || blogData.imageURL || blogData.tags?.length > 0) {
-                navigateTo(`/${blogData.title}`)
-                return
-            }
-
-            initializing.value = true
-        } catch (e: any) {
-            error.value = e?.response?._data?.message || 'Failed to load blog'
-            console.error('Blog loading error:', e)
-        } finally {
-            loading.value = false
-        }
-    })
 </script>
 
 <template>
-    <div>
-        <div v-if="error">{{ error }}</div>
+    <div v-if="error">{{ error }}</div>
 
-        <div v-if="loading">Loading...</div>
-        <div v-else-if="initializing">
-            <h1>Let's customize your blog!</h1>
-            <form @submit.prevent="handleInitialize">
-                <input
-                    v-model="blogInput.blogDescription"
-                    type="text"
-                    placeholder="Blog Description"
-                    :disabled="loading"
-                />
-                <input
-                    type="file"
-                    accept="image/*"
-                    placeholder="Blog Header Image URL"
-                    @change="handleFileUpload"
-                    :disabled="loading"
-                />
-                <input
-                    v-model="blogInput.blogTags"
-                    type="text"
-                    placeholder="Tags (comma-separated)"
-                    @input="blogInput.blogTags = ($event.target as HTMLInputElement).value.split(',')"
-                    :disabled="loading"
-                />
-                <img 
-                    v-if="blogInput.blogImage" 
-                    :src="blogInput.blogImage" 
-                    alt="Preview" 
-                    width="300px"
-                    height="120px"
-                />
-                <button type="submit" :disabled="loading">
-                    {{ loading ? 'Processing...' : 'Initialize Blog' }}
-                </button>
-            </form>
-        </div>
+    <div v-if="loading">Loading...</div>
+    <div v-else-if="initializing">
+        <h1>Let's customize your blog!</h1>
+        <form @submit.prevent="handleInitialize">
+            <input
+                v-model="blogInput.blogDescription"
+                type="text"
+                placeholder="Blog Description"
+                :disabled="loading"
+            />
+            <input
+                type="file"
+                accept="image/*"
+                placeholder="Blog Header Image URL"
+                @change="handleFileUpload"
+                :disabled="loading"
+            />
+            <input
+                v-model="blogInput.blogTags"
+                type="text"
+                placeholder="Tags (comma-separated)"
+                @input="blogInput.blogTags = ($event.target as HTMLInputElement).value.split(',')"
+                :disabled="loading"
+            />
+            <img 
+                v-if="blogInput.blogImage" 
+                :src="blogInput.blogImage" 
+                alt="Preview" 
+                width="300px"
+                height="120px"
+            />
+            <button type="submit" :disabled="loading">
+                {{ loading ? 'Processing...' : 'Initialize Blog' }}
+            </button>
+        </form>
+    </div>
 
-        <div v-else>
-            <h2>Ready to see your blog?</h2>
-            <NuxtLink :to="`/${blogInput.blogTitle}`">Go there now</NuxtLink>
-        </div>
+    <div v-else>
+        <h2>Ready to see your blog?</h2>
+        <NuxtLink :to="`/${blogInput.blogTitle}`">Go there now</NuxtLink>
     </div>
 </template>

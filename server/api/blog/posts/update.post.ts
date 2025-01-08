@@ -2,16 +2,16 @@ import { getServerSession } from '#auth'
 import { Post } from '@prisma/client'
 
 /* 
-Body Structure:
-{
-    postId: ''
-    title: '',
-    heroImg: '',
-    summary: '',
-    content: '',
-    tags: [''],
-    published: bool
-}
+    Body Structure:
+    {
+        postId: ''
+        title: '',
+        heroImg: '',
+        summary: '',
+        content: '',
+        tags: [''],
+        published: bool
+    }
 */
 
 type PostUpdateInput = Partial<Pick<Post, 'title' | 'heroImg' | 'summary' | 'content' | 'tags' | 'published'>>

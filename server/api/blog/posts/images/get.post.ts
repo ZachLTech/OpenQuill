@@ -1,8 +1,8 @@
 /* 
-Body Structure:
-{
-    imageId: string
-}
+    Body Structure:
+    {
+        imageId: string
+    }
 */
 
 export default eventHandler(async event => {

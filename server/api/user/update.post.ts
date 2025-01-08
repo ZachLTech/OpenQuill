@@ -3,14 +3,14 @@ import { User } from '@prisma/client'
 import { hash } from 'bcrypt'
 
 /* 
-Body Structure:
-{
-    name: '',
-    email: '',
-    password: '',
-    image: '',
-    website: ''
-}
+    Body Structure:
+    {
+        name: '',
+        email: '',
+        password: '',
+        image: '',
+        website: ''
+    }
 */
 
 type UserUpdateInput = Partial<Pick<User, 'name' | 'email' | 'password' | 'image' | 'website'>>

@@ -1,8 +1,8 @@
 /* 
-Body Structure:
-{
-    postId: string
-}
+    Body Structure:
+    {
+        postId: string
+    }
 */
 
 export default eventHandler(async event => {

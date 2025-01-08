@@ -1,12 +1,12 @@
 import { getServerSession } from '#auth'
 
 /* 
-Body Structure:
-{
-    postId: '',
-    image: '',
-    alt: '' (Optional)
-}
+    Body Structure:
+    {
+        postId: '',
+        image: '',
+        alt: '' (Optional)
+    }
 */
 
 function checkSize(input: any) {

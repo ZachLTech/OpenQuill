@@ -1,37 +1,21 @@
 <script setup lang="ts">
+    // Types
     import { marked } from 'marked'
     import type { Post, Image } from '@prisma/client'
-
+    type User = {
+        id: string,
+        email: string,
+        name: string
+    }
+    // All initial logic declarations
     const route = useRoute()
     const { data, status } = useAuth()
     const loading = ref(true)
     const error = ref('')
     const post = ref<Post | null>(null)
     const images = ref<Image[]>([])
-
-    type User = {
-        id: string,
-        email: string,
-        name: string
-    }
     const currentSessionUser = ref(data.value?.user as User)
-
-    function replaceImageMarkers(content: string) {
-        if (!content) return ''
-        
-        let processedContent = content
-        // Replace [image:ID:"alt text"] markers with markdown image syntax
-        images.value?.forEach(img => {
-            const markerRegex = new RegExp(`\\[image:${img.id}:"[^"]*"\\]`, 'g')
-            processedContent = processedContent.replace(
-                markerRegex, 
-                `![${img.alt || ''}](${img.image})`
-            )
-        })
-        
-        return marked(processedContent)
-    }
-
+    // Loads post on mount & redirects if the user isn't the owner & the post isn't published yet
     onMounted(async () => {
         try {
             loading.value = true
@@ -81,6 +65,30 @@
             loading.value = false
         }
     })
+    // Handles the contents custom image marker system and replaces it with proper image formatting/URL from DB 
+    function replaceImageMarkers(content: string) {
+        if (!content) return ''
+        
+        let processedContent = content
+        // Replace [image:ID:"alt text"] markers with markdown image syntax or direct URLs
+        images.value?.forEach(img => {
+            // Replace src attribute image markers
+            const srcMarkerRegex = new RegExp(`src="\\[image:${img.id}:"[^"]*"\\]"`, 'g')
+            processedContent = processedContent.replace(
+            srcMarkerRegex, 
+            `src="${img.image}"`
+            )
+
+            // Replace markdown-style image markers
+            const markdownMarkerRegex = new RegExp(`\\[image:${img.id}:"[^"]*"\\]`, 'g')
+            processedContent = processedContent.replace(
+            markdownMarkerRegex, 
+            `![${img.alt || ''}](${img.image})`
+            )
+        })
+        
+        return marked(processedContent)
+    }
 </script>
 
 <template>

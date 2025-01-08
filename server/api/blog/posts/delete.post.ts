@@ -1,10 +1,10 @@
 import { getServerSession } from '#auth'
 
 /* 
-Body Structure:
-{
-    post: <TYPE POST>
-}
+    Body Structure:
+    {
+        post: <TYPE POST>
+    }
 */
 
 export default eventHandler(async event => {

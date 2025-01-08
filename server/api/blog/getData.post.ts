@@ -1,8 +1,8 @@
 /* 
-Body Structure:
-{
-    blogTitle:
-}
+    Body Structure:
+    {
+        blogTitle:
+    }
 */
 
 export default eventHandler(async event => {

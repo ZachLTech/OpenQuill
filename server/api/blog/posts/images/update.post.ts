@@ -2,13 +2,13 @@ import { getServerSession } from '#auth'
 import { Image } from '@prisma/client'
 
 /* 
-Body Structure:
-{
-    imageId: ''
-    image: '',
-    alt: '',
-    caption: '',
-}
+    Body Structure:
+    {
+        imageId: ''
+        image: '',
+        alt: '',
+        caption: '',
+    }
 */
 
 type ImageUpdateInput = Partial<Pick<Image, 'image' | 'alt' | 'caption'>>
