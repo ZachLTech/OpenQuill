@@ -5,7 +5,7 @@
         id: string,
         email: string,
         name: string
-    }
+    } | null | undefined
     // All initial logic declarations
     const route = useRoute()
     const { data, status } = useAuth()
@@ -159,7 +159,7 @@
     <div v-if="blog">
         <!-- Reserved for blog owner -->
         <div v-if="status==='authenticated'">
-            <div v-if="(currentSessionUser as User).id == blog?.ownerId">
+            <div v-if="currentSessionUser.id == blog?.ownerId">
                 <!-- Blog edits -->
                 <NuxtLink v-if="!blogInitialized" :to='`/${blog.title}/start-here`'>Customize your new blog!</NuxtLink>
                 <button v-if="!isEditing && blogInitialized" @click="isEditing = true">Edit Blog</button>
@@ -189,14 +189,14 @@
         <div v-if="posts.length > 0">
             <h2>Posts</h2>
             <div v-for="post in posts" :key="post.id">
-                <div v-if="status==='authenticated'">
-                    <div v-if="!post.published && (currentSessionUser as User).id == blog?.ownerId">
+                <div v-if="status==='authenticated' && currentSessionUser">
+                    <div v-if="!post.published && currentSessionUser.id == blog?.ownerId">
                         <h3>{{ post.title }}</h3>
                         <p>NOT PUBLISHED!</p>
                         <p v-if="post.summary">{{ post.summary }}</p>
                         <NuxtLink :to="`/${blog.title}/${post.id}`">View Post</NuxtLink>
-                        <NuxtLink v-if="(currentSessionUser as User).id == blog?.ownerId" :to="`/${blog.title}/${post.id}-edit`">Edit Post</NuxtLink>
-                        <button v-if="(currentSessionUser as User).id == blog?.ownerId" @click="deletePost(post)">Delete Post</button>
+                        <NuxtLink v-if="currentSessionUser.id == blog?.ownerId" :to="`/${blog.title}/${post.id}-edit`">Edit Post</NuxtLink>
+                        <button v-if="currentSessionUser.id == blog?.ownerId" @click="deletePost(post)">Delete Post</button>
                     </div>
                 </div>
                 <div v-if="post.published">
@@ -204,8 +204,8 @@
                     <p v-if="post.summary">{{ post.summary }}</p>
                     <NuxtLink :to="`/${blog.title}/${post.id}`">View Post</NuxtLink>
                     <div v-if="status==='authenticated'">
-                        <NuxtLink v-if="(currentSessionUser as User).id == blog?.ownerId" :to="`/${blog.title}/${post.id}-edit`">Edit Post</NuxtLink>
-                        <button v-if="(currentSessionUser as User).id == blog?.ownerId" @click="deletePost(post)">Delete Post</button>
+                        <NuxtLink v-if="currentSessionUser.id == blog?.ownerId" :to="`/${blog.title}/${post.id}-edit`">Edit Post</NuxtLink>
+                        <button v-if="currentSessionUser.id == blog?.ownerId" @click="deletePost(post)">Delete Post</button>
                     </div>
                 </div>
                 <div v-else>
