@@ -32,40 +32,56 @@
 </script>
 
 <template>
-    <p>Home</p>
-    <!-- Nav :) -->
-    <div v-if="status==='authenticated'">
-        <NuxtLink to="/profile">Profile</NuxtLink>
-        <button @click="signOut()">Sign Out</button>
-    </div>
-    <div v-else>
-        <NuxtLink to="/signup">Sign Up</NuxtLink>
-        <NuxtLink to="/login">Log In</NuxtLink>
-    </div>
-
-    <div v-if="loading">
-        <br>
-        Page Loading...    
-    </div>
-
-    <div v-else-if="error">
-        {{ error }}
-    </div>
-
-    <div v-else>
-        <div v-if="blogs?.length <= 0 || blogs == null && !instanceInitialized">
-            <p>There aren't any blogs, this must be a new instance. Since this is the first signup, this user will be the blog admin.</p>
-            <signupForm />
+    <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-7xl mx-auto">
+        <!-- Loading State -->
+        <div v-if="loading" class="flex justify-center items-center min-h-[400px]">
+          <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-500"></div>
         </div>
-        <div v-else-if="blogs?.length <= 0 || blogs == null && instanceInitialized">
-            <p>There aren't any blogs right now.</p>
-        </div>
+  
+        <!-- Error State -->
         <div v-else>
-            Blog List:
-            <br><br>
-            <div v-for="blog in blogs">
-                <a :href="`/${blog.title}`">{{ blog.title }}</a>
+            <div v-if="error" class="rounded-lg bg-red-50 p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+                </div>
+                <div class="ml-3">
+                <h3 class="text-sm font-medium text-red-800">{{ error }}</h3>
+                </div>
+            </div>
+            </div>
+            <!-- New Instance State -->
+            <div v-if="blogs?.length <= 0 || blogs == null && !instanceInitialized" 
+                class="text-center py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
+            <h2 class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                Welcome to Your New Blog Instance
+            </h2>
+            <p class="mt-4 text-lg text-gray-500">
+                This appears to be a new instance. The first user to sign up will be the administrator.
+            </p>
+            <div class="mt-8">
+                <signupForm />
+            </div>
+            </div>
+
+            <!-- No Blogs State -->
+            <div v-else-if="blogs?.length <= 0 || blogs == null && instanceInitialized"
+                class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No blogs</h3>
+            <p class="mt-1 text-sm text-gray-500">There aren't any blogs available right now.</p>
+            </div>
+
+            <!-- Blog List (not done) -->
+            <div v-else>
+
             </div>
         </div>
+      </div>
     </div>
-</template>
+  </template>
