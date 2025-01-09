@@ -13,7 +13,7 @@
     let loading = ref(true)
     let error = ref('')
     let blog = ref<Blog | null>(null)
-    let posts = ref<Post[]>([])
+    let posts = ref<any | null>([])
     let postsPerPage = 5
     let currentPage = ref(1)
     let isEditing = ref(false)
@@ -53,17 +53,7 @@
                 }
             })
             
-            posts.value = (() => {
-                let postsDataReformatted: Post[] = []
-
-                for (let i=0;i<postsData.length;i++) {
-                    postsData.push({
-                        ...postsData[i]
-                    })
-                }
-
-                return postsDataReformatted
-            })()
+            posts.value = postsData
 
         } catch (e: any) {
             error.value = 'Error loading blog'

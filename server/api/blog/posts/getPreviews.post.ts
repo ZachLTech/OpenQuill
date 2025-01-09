@@ -19,6 +19,7 @@ export default eventHandler(async event => {
             title: true,
             summary: true,
             tags: true,
+            createdAt: true,
             updatedAt: true,
             published: true,
             owner: {
