@@ -9,8 +9,18 @@ export default {
     "./error.vue",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'text': '#ebeff4',
+        'bg': '#1e1f20',
+        'primary': '#2563eb',
+        'secondary': '#cee2f3',
+        'accent': '#818cf8',
+      },
+    },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/forms'),
+  ],
 }
-
