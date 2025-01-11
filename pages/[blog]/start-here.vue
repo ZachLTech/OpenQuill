@@ -15,6 +15,8 @@
     const initializing = ref(true)
     const thisUserData = data.value?.user
     const dropZoneRef = ref<HTMLDivElement>()
+    const tagInput = ref<HTMLInputElement | null>(null)
+    const STORAGE_KEY = `blog-draft-${route.params.blog}`
     const blogInput = ref({
         blogTitle: route.params.blog as string,
         blogDescription: '',
@@ -23,7 +25,7 @@
     })
     const { isOverDropZone } = useDropZone(dropZoneRef, {
         onDrop,
-        dataTypes: ['image/jpeg'],
+        dataTypes: ['image/jpeg', 'image/JPEG', 'image/JPG', 'image/PNG', 'image/GIF', 'image/WEBP', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
         multiple: false,
         preventDefaultForUnhandled: false,
     })
@@ -43,6 +45,10 @@
                     blogTitle: route.params.blog
                 }
             })
+
+            if (!blogData.description && !blogData.imageURL && !blogData.tags?.length) {
+                loadDraft()
+            }
 
             if (!blogData) {
                 navigateTo('/')
@@ -65,6 +71,10 @@
             loading.value = false
         }
     })
+    // Watch for changes and save draft
+    watch([() => blogInput.value, step], () => {
+        saveDraft()
+    }, { deep: true })
     // Helper functions and form handling stuff
     function checkSize(input: any, inputName: string, size: number) {
         if (input) {
@@ -89,6 +99,70 @@
             }
         }
         return '';
+    }
+
+    const saveDraft = () => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            blogInput: blogInput.value,
+            step: step.value
+            }))
+        }
+    }
+
+    const loadDraft = () => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem(STORAGE_KEY)
+            if (saved) {
+                const data = JSON.parse(saved)
+                blogInput.value = data.blogInput
+                step.value = data.step
+            }
+        }
+    }
+
+    const clearDraft = () => {
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem(STORAGE_KEY)
+        }
+    }
+
+    function handleTagInput(event: Event) {
+        const target = event.target as HTMLInputElement
+        const value = target.value
+
+        if (!value) return
+
+        if (value.includes(',')) {
+            const newTags = value
+                .split(',')
+                .map(tag => tag.trim())
+                .filter(tag => tag && !blogInput.value.blogTags.includes(tag))
+
+            if (newTags.length > 0) {
+                blogInput.value.blogTags.push(...newTags)
+            }
+            
+            target.value = ''
+        }
+    }
+
+    function handleTagKeydown(event: KeyboardEvent) {
+        const target = event.target as HTMLInputElement
+        const value = target.value.trim()
+
+        if (event.key === ',' && value) {
+            event.preventDefault()
+            if (!blogInput.value.blogTags.includes(value)) {
+                blogInput.value.blogTags.push(value)
+            }
+            target.value = ''
+        }
+    }
+
+    function handleDragOver(event: DragEvent) {
+        event.preventDefault()
+        event.stopPropagation()
     }
 
     function validateInput(blogInput: any): string {        
@@ -127,6 +201,16 @@
             blogInput.value.blogImage = e.target?.result as string
         }
         reader.readAsDataURL(file)
+    }
+
+    function handleDrop(event: DragEvent) {
+        event.preventDefault()
+        event.stopPropagation()
+        
+        const files = event.dataTransfer?.files
+        if (files && files.length > 0) {
+            handleFileUpload({ target: { files: files } } as unknown as Event)
+        }
     }
 
     async function handleFileUpload(event: Event) {
@@ -177,6 +261,7 @@
             })
 
             if (data) {
+                clearDraft()
                 initializing.value = false
             }
         } catch (e: any) {
@@ -189,13 +274,13 @@
 </script>
 
 <template>
-    <div v-if="error" class="p-4 w-screen flex justify-center">
+    <div v-if="error" class="p-4 w-screen flex justify-center absolute">
         <div class="w-full p-4 rounded-lg bg-red-500 bg-opacity-20 flex">
-            <div class="flex-shrink-0">
+            <button @click="error=''" class="flex-shrink-0">
                 <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                 </svg>
-            </div>
+            </button>
             <div class="ml-3">
                 <h3 class="text-sm font-medium text-red-400">{{ error }}</h3>
             </div>
@@ -221,25 +306,16 @@
                 />
             </div>
             <div v-if="step==2" class="h-[60vh] flex flex-col">
-                <!-- <img 
-                    v-if="blogInput.blogImage" 
-                    :src="blogInput.blogImage" 
-                    alt="Preview" 
-                    width="300px"
-                    height="120px"
-                /> -->
-                <h1 class="text-3xl text-center font-extrabold tracking-tight text-text sm:text-4xl">Now how about a blog image?</h1>
-                <label 
-                    for="fileInput" 
-                    class="mt-[5vh] block w-[45vw] h-[40vh] p-4 bg-gray-700 bg-opacity-15 border-2 border-dashed border-secondary border-opacity-25 rounded-lg text-center cursor-pointer hover:border-opacity-50 transition-all"
-                >
-                    <div class="h-full flex flex-col items-center justify-center">
-                        <svg class="w-16 h-16 mb-4 text-secondary opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                <h1 class="text-3xl text-center font-extrabold tracking-tight text-text sm:text-4xl">How about a banner image for your blog 🤨</h1>
+                <label for="description" class="mt-[5vh] mb-2 text-lg text-secondary opacity-15 flex items-center">Add a Blog Banner Image (Optional)
+                    <button v-if="blogInput.blogImage" 
+                        @click.prevent="blogInput.blogImage = ''" 
+                        class="p-1 rounded-full"
+                    >
+                        <svg class="w-5 h-5 text-white hover:text-red-400 transition-colors" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                         </svg>
-                        <span class="text-secondary text-lg opacity-50">Click to upload or drag and drop</span>
-                        <span class="text-md text-secondary opacity-40 mt-2">JPEG, PNG, WEBP or GIF (max. 15MB)</span>
-                    </div>
+                    </button>
                 </label>
                 <input
                     type="file"
@@ -251,18 +327,67 @@
                     @change="handleFileUpload"
                     placeholder="Blog Header Image URL"
                 />
+                <label 
+                    for="fileInput" 
+                    class="flex justify-center items-center w-[45vw] h-[40vh] p-4 bg-gray-700 bg-opacity-15 border-2 border-dashed border-secondary border-opacity-25 rounded-lg text-center cursor-pointer hover:border-opacity-50 transition-all"
+                    @dragover="handleDragOver"
+                    @drop="handleDrop"
+                >   
+                    <div v-if="!blogInput.blogImage" class="h-full flex flex-col items-center justify-center">
+                        <svg class="w-16 h-16 mb-4 text-secondary opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        <span class="text-secondary text-lg opacity-50">Click to upload or drag and drop</span>
+                        <span class="text-md text-secondary opacity-40 mt-2">JPEG, PNG, WEBP or GIF (max. 15MB)</span>
+                    </div>
+                    <img 
+                        v-if="blogInput.blogImage" 
+                        :src="blogInput.blogImage" 
+                        alt="Preview" 
+                        class="w-[90%] h-[90%] rounded"
+                    />
+                </label>
             </div>
-            <div v-if="step==3">
-                <input
-                    v-model="blogInput.blogTags"
-                    type="text"
-                    placeholder="Tags (comma-separated)"
-                    @input="blogInput.blogTags = ($event.target as HTMLInputElement).value.split(',')"
+            <div v-if="step==3" class="h-[60vh] flex flex-col">
+                <div class="flex flex-col">
+                    <h1 class="text-3xl text-center font-extrabold tracking-tight text-text sm:text-4xl">Now some tags to make your blog unique 🏷️</h1>
+                    <label for="description" class="mt-[5vh] mb-2 text-lg text-secondary opacity-15">Add some Blog Tags (Optional)</label>
+                    <div class="relative w-[85vw] sm:w-[45vw] min-h-[50px] p-2 bg-gray-700 bg-opacity-15 rounded-lg flex flex-wrap gap-2 items-center">
+                        <span v-for="(tag, index) in blogInput.blogTags" :key="index" 
+                            class="bg-secondary bg-opacity-15 text-text px-3 py-1 rounded flex items-center gap-2">
+                            {{ tag }}
+                            <button @click="blogInput.blogTags.splice(index, 1)" type="button" 
+                                class="hover:text-red-400 transition-colors text-xs">
+                                ✕
+                            </button>
+                        </span>
+                        <input
+                            ref="tagInput"
+                            @input="handleTagInput"
+                            @keydown="handleTagKeydown"
+                            type="text"
+                            class="flex-grow bg-transparent border-none focus:outline-none text-text p-2 focus:ring-secondary focus:ring-opacity-20 rounded"
+                            placeholder="Type tags and press comma to add..."
+                            :disabled="loading"
+                        />
+                    </div>
+                </div>
+            </div>
+            <div v-if="step==4" class="h-[60vh] flex flex-col items-center">
+                <h1 class="text-3xl text-center font-extrabold tracking-tight text-text sm:text-4xl">Almost There ❗❗</h1>
+                <p class="text-lg text-center text-secondary opacity-70 mt-8 mb-8">
+                    Ready to create your blog? Click below to finish setup!
+                </p>
+                <button 
+                    type="submit" 
                     :disabled="loading"
-                />
+                    class="w-full py-4 bg-primary text-lg font-medium rounded-lg hover:bg-opacity-90 transition-all disabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed"
+                >
+                    {{ loading ? 'Processing...' : 'Initialize Blog' }}
+                </button>
             </div>
             <div class="absolute flex items-center gap-12 bottom-10">
-                <button type="button" @click="step--" class="py-3 px-8 border text-gray-400 border-primary rounded hover:bg-opacity-90 disabled:border-gray-600 disabled:hover:cursor-not-allowed transition-all" :disabled="step==1">Back</button>
+                <button type="button" @click="step--" class="py-3 px-8 border text-gray-400 border-primary rounded hover:border-opacity-70 disabled:border-gray-600 disabled:hover:cursor-not-allowed transition-all" :disabled="step==1">Back</button>
                 <div class="flex h-full gap-4">
                     <div class="h-4 w-4 rounded-full bg-gray-700 bg-opacity-25">
                         <div v-if="step==1" class="w-full h-full bg-primary border-4 border-gray-700 rounded-full"></div>
@@ -280,14 +405,48 @@
                 
                 <button type="button" @click="step++" class="py-3 px-8 bg-primary rounded hover:bg-opacity-90 disabled:bg-gray-600 disabled:text-gray-400 disabled:hover:cursor-not-allowed transition-all" :disabled="step==4">Next</button>
             </div>
-            <button type="submit" :disabled="loading" v-if="step==4">
-                {{ loading ? 'Processing...' : 'Initialize Blog' }}
-            </button>
         </form>
     </div>
 
-    <div v-else>
-        <h2>Ready to see your blog?</h2>
-        <NuxtLink :to="`/${blogInput.blogTitle}`">Go there now</NuxtLink>
+    <div v-else class="flex flex-col items-center justify-center h-screen space-y-8 animate-fadeIn overflow-hidden">
+        <div v-for="n in 20" :key="n" 
+            class="confetti-piece"
+            :style="{
+                left: `${Math.random() * 100}%`,
+                top: '-65px',
+                background: `hsl(${Math.random() * 360}, 70%, 50%)`,
+                animationDelay: `${Math.random() * 3}s`
+            }"
+        ></div>
+        <h2 class="text-4xl font-bold text-text animate-bounce">
+            🎉 Your Blog is Ready! 🎉
+        </h2>
+        <NuxtLink 
+            :to="`/${blogInput.blogTitle}`"
+            class="px-8 py-4 text-xl font-semibold text-white bg-primary rounded-lg hover:bg-opacity-90 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+            Visit Your New Blog
+        </NuxtLink>
     </div>
 </template>
+
+<style>
+    @keyframes confetti {
+        0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+    .confetti-piece {
+        position: absolute;
+        width: 10px;
+        height: 30px;
+        background: #ffd700;
+        top: -10px;
+        animation: confetti 3s ease-in-out infinite;
+    }
+    .animate-fadeIn {
+        animation: fadeIn 1s ease-in;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
