@@ -46,7 +46,7 @@
                 }
             })
 
-            if (!blogData.description && !blogData.imageURL && !blogData.tags?.length) {
+            if (blogData && !blogData.description && !blogData.imageURL && !blogData.tags?.length) {
                 loadDraft()
             }
 

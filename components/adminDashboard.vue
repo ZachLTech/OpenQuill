@@ -106,7 +106,7 @@
 </script>
 
 <template>
-    <div class="p-8 bg-bg">
+    <div class="bg-bg">
         <div v-if="error" class="mb-6 p-4 rounded-lg bg-red-500 bg-opacity-20">
             <p class="text-sm text-red-400">{{ error }}</p>
         </div>

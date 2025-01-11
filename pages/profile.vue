@@ -1,4 +1,5 @@
 <script setup lang="ts">
+    import { useDropZone } from '@vueuse/core'
     // Types
     import type { User } from '@prisma/client'
     // All initial logic declarations
@@ -8,12 +9,19 @@
     const hasChanges = ref(false)
     const wantsToDeleteAccount = ref(false)
     const currentUser = ref<User | null>(null)
+    const dropZoneRef = ref<HTMLDivElement>()
     const userInput = ref({
         name: '',
         email: '',
         password: '',
         image: '',
         website: ''
+    })
+    const { isOverDropZone } = useDropZone(dropZoneRef, {
+        onDrop,
+        dataTypes: ['image/jpeg', 'image/JPEG', 'image/JPG', 'image/PNG', 'image/GIF', 'image/WEBP', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
+        multiple: false,
+        preventDefaultForUnhandled: false,
     })
     // If the user isn't even authenticated then they getting booted back to login
     if (status.value === 'unauthenticated') {
@@ -72,13 +80,108 @@
         }
     }
 
+    function validateInput(signupInput: any): string {
+        const emailRegex = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/
+        const usernameRegex = /^[0-9A-Za-z\s-]{2,16}$/
+        const passwordRegex = /^(?=.*?[A-Z])(?=.*?[0-9]).{8,}$/
+        const blognameRegex = /^[a-zA-Z0-9\s-]{2,50}$/
+        
+        if (!emailRegex.test(signupInput?.email)) {
+            return 'The Email you entered is not valid.'
+        } else if (!usernameRegex.test(signupInput?.username)) {
+            return 'Username should be between 2 and 16 characters. Alphanumeric only.'
+        } else if (!passwordRegex.test(signupInput?.password)) {
+            return 'Password should be at least 8 characters including a number and uppercase letter'
+        } else if (!blognameRegex.test(signupInput?.blogname)) {
+            return 'Blog Name should be between 2 and 50 characters. Alphanumeric and spaces only.'
+        } else {
+            return ''
+        }
+    }
+
+    async function onDrop(files: File[] | null) {
+        error.value = ''
+        const allowedFiletypes = ['image/jpeg', 'image/JPEG', 'image/JPG', 'image/PNG', 'image/GIF', 'image/WEBP', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+        
+        if (!files || files.length === 0) return
+        
+        const file = files[0] // Take the first file since multiple is false
+
+        if (!allowedFiletypes.includes(file.type)) {
+            error.value = `Please upload a valid image file (JPEG, PNG, WEBP, or GIF)`
+            return
+        }
+        
+        if (file.size >= 15 * 1024 * 1024) {
+            error.value = 'File size cannot exceed 15MB.'
+            return
+        }
+
+        const reader = new FileReader()
+        reader.onload = (e) => {
+            userInput.value.image = e.target?.result as string
+        }
+        reader.readAsDataURL(file)
+    }
+
+    function handleDragOver(event: DragEvent) {
+        event.preventDefault()
+        event.stopPropagation()
+    }
+
+    function handleDrop(event: DragEvent) {
+        event.preventDefault()
+        event.stopPropagation()
+        
+        const files = event.dataTransfer?.files
+        if (files && files.length > 0) {
+            handleFileUpload({ target: { files: files } } as unknown as Event)
+        }
+    }
+
+    async function handleFileUpload(event: Event) {
+        error.value = ''
+        const allowedFiletypes = ['image/jpeg', 'image/JPEG', 'image/JPG', 'image/PNG', 'image/GIF', 'image/WEBP', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+        const input = event.target as HTMLInputElement
+        const file = input.files?.[0]
+        
+        if (!file) return
+
+        if (!allowedFiletypes.includes(file.type)) {
+            error.value = `Please upload a valid image file (JPEG, PNG, WEBP, or GIF)`
+            return
+        }
+        
+        if (file.size >= 15 * 1024 * 1024) {
+            error.value = 'File size cannot exceed 15MB.'
+            return
+        }
+
+        const reader = new FileReader()
+        reader.onload = (e) => {
+            userInput.value.image = e.target?.result as string
+        }
+        reader.readAsDataURL(file)
+    }
+
     async function updateProfile() {
         try {
             loading.value = true
-            error.value = ''
 
             if (currentUser.value && currentUser.value.frozen) {
                 error.value = 'You can\'t do this. Your account is currently frozen.'
+                return
+            }
+
+            userInput.value.email = userInput.value.email.trim().toLowerCase()
+            userInput.value.name = userInput.value.name.trim()
+            userInput.value.password = userInput.value.password.trim()
+            userInput.value.image = userInput.value.image.trim()
+            userInput.value.website = userInput.value.website.trim()
+
+            error.value = validateInput(userInput.value)
+
+            if (error.value != '') {
                 return
             }
 
@@ -107,87 +210,167 @@
 </script>
 
 <template>
-    <tempNav />
-    
-    <h1>Profile Settings</h1>
-    
-    <div v-if="error">
-        {{ error }}
-    </div>
+    <div class="min-h-screen bg-bg py-8 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl font-extrabold text-text mb-8">Profile Settings</h1>
+            
+            <!-- Error Alert -->
+            <div v-if="error" class="mb-6 p-4 rounded-lg bg-red-500 bg-opacity-20">
+                <p class="text-sm text-red-400">{{ error }}</p>
+            </div>
 
-    <form @submit.prevent="updateProfile">
-        <div>
-            <label>Name</label>
-            <input
-                v-model="userInput.name"
-                type="text"
-                placeholder="Your name"
-                :disabled="loading"
-            />
-        </div>
+            <!-- Profile Form -->
+            <form @submit.prevent="updateProfile" class="space-y-6 bg-gray-700 bg-opacity-15 p-8 rounded-lg">
+                <!-- Name Input -->
+                <div>
+                    <label class="block text-sm font-medium text-secondary opacity-70 mb-2">Name</label>
+                    <input
+                        v-model="userInput.name"
+                        type="text"
+                        placeholder="Your name"
+                        :disabled="loading"
+                        class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg 
+                               placeholder-secondary placeholder-opacity-25 
+                               focus:ring-secondary focus:ring-opacity-20
+                               text-text
+                               disabled:bg-opacity-10 disabled:cursor-not-allowed
+                               transition-all"
+                    />
+                </div>
 
-        <div>
-            <label>Email</label>
-            <input
-                v-model="userInput.email"
-                type="email"
-                placeholder="Your email"
-                :disabled="loading"
-            />
-        </div>
+                <!-- Email Input -->
+                <div>
+                    <label class="block text-sm font-medium text-secondary opacity-70 mb-2">Email</label>
+                    <input
+                        v-model="userInput.email"
+                        type="email"
+                        placeholder="Your email"
+                        :disabled="loading"
+                        class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg 
+                               placeholder-secondary placeholder-opacity-25 
+                               focus:ring-secondary focus:ring-opacity-20
+                               text-text
+                               disabled:bg-opacity-10 disabled:cursor-not-allowed
+                               transition-all"
+                    />
+                </div>
 
-        <div>
-            <label>New Password (leave empty to keep current)</label>
-            <input
-                v-model="userInput.password"
-                type="password"
-                placeholder="New password"
-                :disabled="loading"
-            />
-        </div>
+                <!-- Password Input -->
+                <div>
+                    <label class="block text-sm font-medium text-secondary opacity-70 mb-2">
+                        New Password (leave empty to keep current)
+                    </label>
+                    <input
+                        v-model="userInput.password"
+                        type="password"
+                        placeholder="New password"
+                        :disabled="loading"
+                        class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg 
+                               placeholder-secondary placeholder-opacity-25 
+                               focus:ring-secondary focus:ring-opacity-20
+                               text-text
+                               disabled:bg-opacity-10 disabled:cursor-not-allowed
+                               transition-all"
+                    />
+                </div>
 
-        <div>
-            <label>Profile Image URL</label>
-            <input
-                v-model="userInput.image"
-                type="url"
-                placeholder="Profile image URL"
-                :disabled="loading"
-            />
-        </div>
+                <!-- Profile Image URL -->
+                <input
+                    type="file"
+                    ref="dropZoneRef"
+                    accept="image/*"
+                    class="hidden" 
+                    id="fileInput"
+                    :disabled="loading"
+                    @change="handleFileUpload"
+                    placeholder="Blog Header Image URL"
+                />
+                <label class="block text-sm font-medium text-secondary opacity-70 mb-2">Profile Image URL</label>
+                <label 
+                    for="fileInput" 
+                    class="flex justify-center items-center w-[45vw] h-[40vh] p-4 bg-gray-700 bg-opacity-15 border-2 border-dashed border-secondary border-opacity-25 rounded-lg text-center cursor-pointer hover:border-opacity-50 transition-all"
+                    @dragover="handleDragOver"
+                    @drop="handleDrop"
+                >   
+                    <div v-if="!userInput.image" class="h-full flex flex-col items-center justify-center">
+                        <svg class="w-16 h-16 mb-4 text-secondary opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        <span class="text-secondary text-lg opacity-50">Click to upload or drag and drop</span>
+                        <span class="text-md text-secondary opacity-40 mt-2">JPEG, PNG, WEBP or GIF (max. 15MB)</span>
+                    </div>
+                    <img 
+                        v-if="userInput.image" 
+                        :src="userInput.image" 
+                        alt="Preview" 
+                        class="w-[90%] h-[90%] rounded"
+                    />
+                </label>
 
-        <div>
-            <label>Website</label>
-            <input
-                v-model="userInput.website"
-                type="url"
-                placeholder="Your website"
-                :disabled="loading"
-            />
-        </div>
+                <!-- Website URL -->
+                <div>
+                    <label class="block text-sm font-medium text-secondary opacity-70 mb-2">Website</label>
+                    <input
+                        v-model="userInput.website"
+                        type="url"
+                        placeholder="Your website"
+                        :disabled="loading"
+                        class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg 
+                               placeholder-secondary placeholder-opacity-25 
+                               focus:ring-secondary focus:ring-opacity-20
+                               text-text
+                               disabled:bg-opacity-10 disabled:cursor-not-allowed
+                               transition-all"
+                    />
+                </div>
 
-        <div>
-            <button 
-                type="submit" 
-                :disabled="loading || !hasChanges"
-            >
-                {{ loading ? 'Saving...' : hasChanges ? 'Save Changes' : 'Saved' }}
-            </button>
-        </div>
-    </form>
+                <!-- Submit Button -->
+                <button 
+                    type="submit" 
+                    :disabled="loading || !hasChanges"
+                    class="w-full py-4 bg-primary text-lg font-medium rounded-lg 
+                           hover:bg-opacity-90 transition-all
+                           disabled:bg-gray-600 disabled:text-gray-400 
+                           disabled:cursor-not-allowed"
+                >
+                    {{ loading ? 'Saving...' : hasChanges ? 'Save Changes' : 'Saved' }}
+                </button>
+            </form>
 
-    <div v-if="currentUser?.admin">
-        <adminDashboard />
-    </div>
+            <!-- Admin Dashboard -->
+            <div v-if="currentUser?.admin" class="mt-8">
+                <adminDashboard />
+            </div>
 
-    <div>
-        <h2>Danger Zone</h2>
-        <button @click="wantsToDeleteAccount=true">Delete Account</button>
-        
-        <div v-if="wantsToDeleteAccount">
-            <p>Are you sure you want to delete your account?</p>
-            <button @click="deleteAccount()">Yes, Delete</button>
-            <button @click="wantsToDeleteAccount = false">Cancel</button>
+            <!-- Danger Zone -->
+            <div class="mt-8 bg-red-500 bg-opacity-10 p-8 rounded-lg">
+                <h2 class="text-xl font-bold text-red-400 mb-4">Danger Zone</h2>
+                <button 
+                    @click="wantsToDeleteAccount=true"
+                    class="px-4 py-2 bg-red-500 text-white rounded hover:bg-opacity-90 transition-all"
+                >
+                    Delete Account
+                </button>
+                
+                <!-- Delete Confirmation -->
+                <div v-if="wantsToDeleteAccount" class="mt-4 p-4 bg-red-500 bg-opacity-20 rounded-lg">
+                    <p class="text-red-400 mb-4">Are you sure you want to delete your account?</p>
+                    <div class="flex gap-4">
+                        <button 
+                            @click="deleteAccount()"
+                            class="px-4 py-2 bg-red-500 text-white rounded hover:bg-opacity-90 transition-all"
+                        >
+                            Yes, Delete
+                        </button>
+                        <button 
+                            @click="wantsToDeleteAccount = false"
+                            class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-opacity-90 transition-all"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
