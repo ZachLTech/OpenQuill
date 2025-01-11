@@ -36,7 +36,7 @@
       <div class="max-w-7xl mx-auto">
         <!-- Loading State -->
         <div v-if="loading" class="flex justify-center items-center min-h-[400px]">
-          <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-500 border-t-green-500"></div>
+          <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-800 border-t-primary"></div>
         </div>
   
         <!-- Error State -->

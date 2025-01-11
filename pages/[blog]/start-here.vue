@@ -288,7 +288,7 @@
     </div>
 
     <div v-if="loading" class="flex justify-center items-center w-screen h-[95vh]">
-        <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-500 border-t-green-500"></div>
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-800 border-t-primary"></div>
     </div>
 
     <div v-else-if="initializing">

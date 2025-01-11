@@ -7,6 +7,6 @@
 </script>
 
 <template>
-        <NuxtLink to="/">Home</NuxtLink>
-        <loginForm />
+    <NuxtLink to="/">Home</NuxtLink>
+    <loginForm class="mt-[15vh]" />
 </template>

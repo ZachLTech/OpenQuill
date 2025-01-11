@@ -89,43 +89,72 @@
 </script>
 
 <template>
-    <form @submit.prevent="handleSignup">
-        <h2>Signup</h2>
-        <p>
+    <form @submit.prevent="handleSignup" class="w-full max-w-md mx-auto bg-gray-700 bg-opacity-15 p-8 rounded-lg shadow-lg">
+        <h2 class="text-3xl font-extrabold text-text text-center mb-6">Create Account</h2>
+        
+        <p class="text-center text-secondary opacity-70 mb-8">
             Have an account? 
-            <NuxtLink to="/login">Log In</NuxtLink>
+            <NuxtLink to="/login" class="text-primary hover:text-opacity-80 transition-colors">
+                Log In
+            </NuxtLink>
         </p>
-        <p v-if="error">{{ error }}</p>
-        <input 
-            v-model="signup.email" 
-            type="email" 
-            placeholder="Email" 
-            required 
-            :disabled="loading"
-        />
-        <input 
-            v-model="signup.username" 
-            type="text" 
-            placeholder="Username" 
-            required 
-            :disabled="loading"
-        />
-        <input 
-            v-model="signup.password" 
-            type="password" 
-            placeholder="Password" 
-            required 
-            :disabled="loading"
-        />
-        <input 
-            v-model="signup.blogname" 
-            type="text" 
-            placeholder="Blog Name" 
-            required 
-            :disabled="loading"
-        />
-        <button type="submit" :disabled="loading">
-            {{ loading ? 'Processing...' : 'Signup' }}
-        </button>
+
+        <div v-if="error" class="mb-6 p-4 rounded-lg bg-red-500 bg-opacity-20">
+            <p class="text-sm text-red-400">{{ error }}</p>
+        </div>
+
+        <div class="space-y-5">
+            <div>
+                <input 
+                    v-model="signup.email" 
+                    type="email" 
+                    placeholder="Email" 
+                    required 
+                    :disabled="loading"
+                    class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20text-textdisabled:bg-opacity-10 disabled:cursor-not-allowedtransition-all"
+                />
+            </div>
+
+            <div>
+                <input 
+                    v-model="signup.username" 
+                    type="text" 
+                    placeholder="Username" 
+                    required 
+                    :disabled="loading"
+                    class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20text-textdisabled:bg-opacity-10 disabled:cursor-not-allowedtransition-all"
+                />
+            </div>
+
+            <div>
+                <input 
+                    v-model="signup.password" 
+                    type="password" 
+                    placeholder="Password" 
+                    required 
+                    :disabled="loading"
+                    class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20text-textdisabled:bg-opacity-10 disabled:cursor-not-allowedtransition-all"
+                />
+            </div>
+
+            <div>
+                <input 
+                    v-model="signup.blogname" 
+                    type="text" 
+                    placeholder="Blog Name" 
+                    required 
+                    :disabled="loading"
+                    class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20text-textdisabled:bg-opacity-10 disabled:cursor-not-allowedtransition-all"
+                />
+            </div>
+
+            <button 
+                type="submit" 
+                :disabled="loading"
+                class="w-full py-4 bg-primary text-lg font-medium rounded-lg hover:bg-opacity-90 transition-alldisabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed"
+            >
+                {{ loading ? 'Processing...' : 'Sign Up' }}
+            </button>
+        </div>
     </form>
 </template>

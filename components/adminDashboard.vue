@@ -106,58 +106,80 @@
 </script>
 
 <template>
-    <h1>Admin Dashboard</h1>
-    
-    <div v-if="error">{{ error }}</div>
-    
-    <div v-if="loading">Loading users...</div>
-    
-    <div v-else>
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Blog</th>
-                    <th>Created</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="user in users" :key="user.id">
-                    <td>{{ user.name }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>
-                        <NuxtLink 
-                            v-if="user.blog" 
-                            :to="`/${user.blog.title}`"
-                        >
-                            {{ user.blog.title }}
-                        </NuxtLink>
-                        <span v-else>No blog</span>
-                    </td>
-                    <td>{{ user.createdAt.toLocaleDateString() }}</td>
-                    <td>
-                        <span v-if="user.admin">Admin</span>
-                        <span v-if="user.frozen">Frozen</span>
-                    </td>
-                    <td>
-                        <button 
-                            @click="toggleAdminStatus(user)"
-                            :disabled="user.email === currentUser?.email"
-                        >
-                            {{ user.admin ? 'Remove Admin' : 'Make Admin' }}
-                        </button>
-                        <button 
-                            @click="toggleFrozenStatus(user)"
-                        >
-                            {{ user.frozen ? 'Unfreeze' : 'Freeze' }}
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="p-8 bg-bg">
+        <div v-if="error" class="mb-6 p-4 rounded-lg bg-red-500 bg-opacity-20">
+            <p class="text-sm text-red-400">{{ error }}</p>
+        </div>
+        
+        <div v-if="loading" class="flex justify-center items-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-800 border-t-primary"></div>
+        </div>
+        
+        <div v-else class="bg-gray-700 bg-opacity-15 rounded-lg overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-gray-700 bg-opacity-50">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-sm font-medium text-text">Name</th>
+                        <th class="px-6 py-4 text-left text-sm font-medium text-text">Email</th>
+                        <th class="px-6 py-4 text-left text-sm font-medium text-text">Blog</th>
+                        <th class="px-6 py-4 text-left text-sm font-medium text-text">Created</th>
+                        <th class="px-6 py-4 text-left text-sm font-medium text-text">Status</th>
+                        <th class="px-6 py-4 text-left text-sm font-medium text-text">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700 divide-opacity-25">
+                    <tr v-for="user in users" :key="user.id" 
+                        class="hover:bg-gray-700 hover:bg-opacity-25 transition-colors">
+                        <td class="px-6 py-4 text-sm text-text">{{ user.name }}</td>
+                        <td class="px-6 py-4 text-sm text-text">{{ user.email }}</td>
+                        <td class="px-6 py-4 text-sm">
+                            <NuxtLink 
+                                v-if="user.blog" 
+                                :to="`/${user.blog.title}`"
+                                class="text-primary hover:text-opacity-80 transition-colors"
+                            >
+                                {{ user.blog.title }}
+                            </NuxtLink>
+                            <span v-else class="text-secondary opacity-50">No blog</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-text">
+                            {{ user.createdAt.toLocaleDateString() }}
+                        </td>
+                        <td class="px-6 py-4 text-sm">
+                            <div class="flex gap-2">
+                                <span v-if="user.admin" 
+                                    class="px-2 py-1 text-xs rounded-full bg-primary bg-opacity-20 text-primary">
+                                    Admin
+                                </span>
+                                <span v-if="user.frozen" 
+                                    class="px-2 py-1 text-xs rounded-full bg-red-500 bg-opacity-20 text-red-400">
+                                    Frozen
+                                </span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-sm">
+                            <div class="flex gap-2">
+                                <button 
+                                    @click="toggleAdminStatus(user)"
+                                    :disabled="user.email === currentUser?.email"
+                                    class="px-3 py-1 rounded-lg bg-primary text-text hover:bg-opacity-90 
+                                        disabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed 
+                                        transition-colors"
+                                >
+                                    {{ user.admin ? 'Remove Admin' : 'Make Admin' }}
+                                </button>
+                                <button 
+                                    @click="toggleFrozenStatus(user)"
+                                    class="px-3 py-1 rounded-lg bg-red-500 text-text hover:bg-opacity-90 
+                                        transition-colors"
+                                >
+                                    {{ user.frozen ? 'Unfreeze' : 'Freeze' }}
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>
-
