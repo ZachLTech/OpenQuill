@@ -2,7 +2,6 @@
     // Types
     import type { Blog } from '@prisma/client'
     // All initial logic declarations
-    const { status, signOut } = useAuth()
     const autoRedirectSingleBlog = useRuntimeConfig().public.firstBlogAutoRedirect
     const loading = ref(true)
     const instanceInitialized = ref(false)
@@ -32,6 +31,7 @@
 </script>
 
 <template>
+    <appNav v-if="blogs?.length > 0 && blogs != null && instanceInitialized" />
     <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       <div class="max-w-7xl mx-auto">
         <!-- Loading State -->
@@ -41,7 +41,7 @@
   
         <!-- Error State -->
         <div v-else>
-            <div v-if="error" class="p-4 w-screen flex justify-center absolute">
+            <div v-if="error" class="p-4 w-full flex justify-center absolute">
                 <div class="w-full p-4 rounded-lg bg-red-500 bg-opacity-20 flex">
                     <button @click="error=''" class="flex-shrink-0">
                         <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">

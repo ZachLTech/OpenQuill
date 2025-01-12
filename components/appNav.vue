@@ -1,0 +1,108 @@
+<script setup lang="ts">
+    type fullUser = {
+        email: string;
+        name: string;
+        id: string;
+        admin: boolean;
+        frozen: boolean;
+        password: string | null;
+        image: string | null;
+        website: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+        blog: {
+            title: string,
+            description?: string,
+            imageURL?: string,
+            tags: string[],
+            createdAt: Date
+        }
+    }
+
+    const { status, signOut } = useAuth()
+    const route = useRoute()
+    const props = defineProps<{
+        user?: fullUser
+    }>()
+    const isActive = computed(() => (path: string) => route.path === path)
+    let userBlogPath = ref((() => {
+        if (props.user?.blog.title) {
+            return `/${props.user.blog.title}`
+        } else {
+            return null
+        }
+    })())
+    computed(() => props.user?.blog?.title ? `/${props.user.blog.title}` : null)
+
+    onMounted(async () => {
+        if (!props.user && status.value === 'authenticated') {
+            const user = await $fetch('/api/user/getAllData')
+            if (user?.blog?.title) {
+                userBlogPath.value = `/${user.blog.title}`
+            }
+        }
+    })
+</script>
+
+<template>
+    <nav class="w-full bg-gray-700 bg-opacity-15 py-4 px-6 mb-8">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <NuxtLink 
+                to="/" 
+                class="text-xl font-bold text-text hover:text-primary transition-colors"
+            >
+                Home
+            </NuxtLink>
+
+            <div class="flex items-center gap-6">
+                <div v-if="status === 'authenticated'" class="flex items-center gap-6">
+                    <NuxtLink 
+                        to="/" 
+                        :class="`text-${isActive('/') ? 'primary' : 'text'} hover:text-primary transition-colors`"
+                    >
+                        Home
+                    </NuxtLink>
+                    <NuxtLink 
+                        v-if="userBlogPath"
+                        :to="userBlogPath"
+                        :class="`text-${isActive(userBlogPath) ? 'primary' : 'text'} hover:text-primary transition-colors`"
+                    >
+                        My Blog
+                    </NuxtLink>
+                    <NuxtLink 
+                        to="/profile" 
+                        :class="`text-${isActive('/profile') ? 'primary' : 'text'} hover:text-primary transition-colors`"
+                    >
+                        Profile
+                    </NuxtLink>
+                    <button 
+                        @click="signOut()" 
+                        class="px-4 py-2 text-text bg-gray-700 bg-opacity-25 rounded-lg hover:bg-opacity-40 transition-all"
+                    >
+                        Sign Out
+                    </button>
+                </div>
+                <div v-else class="flex items-center gap-6">
+                    <NuxtLink 
+                        to="/" 
+                        :class="`text-${isActive('/') ? 'primary' : 'text'} hover:text-primary transition-colors`"
+                    >
+                        Home
+                    </NuxtLink>
+                    <NuxtLink 
+                        to="/signup" 
+                        :class="`text-${isActive('/signup') ? 'primary' : 'text'} hover:text-primary transition-colors`"
+                    >
+                        Sign Up
+                    </NuxtLink>
+                    <NuxtLink 
+                        to="/login" 
+                        class="px-4 py-2 text-text bg-primary rounded-lg hover:bg-opacity-90 transition-all"
+                    >
+                        Log In
+                    </NuxtLink>
+                </div>
+            </div>
+        </div>
+    </nav>
+</template>

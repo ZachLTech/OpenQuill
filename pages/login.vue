@@ -7,6 +7,6 @@
 </script>
 
 <template>
-    <NuxtLink to="/">Home</NuxtLink>
+    <!-- <appNav /> -->
     <loginForm class="mt-[15vh]" />
 </template>

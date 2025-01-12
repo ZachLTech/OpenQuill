@@ -38,6 +38,10 @@ export default NuxtAuthHandler({
                 token.sub = user.id;
             }
             return token;
+        },
+        async redirect({ url, baseUrl }) {
+            if (url.startsWith("/")) return `${baseUrl}${url}`
+            return baseUrl
         }
     },
     providers: [

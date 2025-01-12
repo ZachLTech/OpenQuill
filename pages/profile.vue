@@ -29,6 +29,8 @@
     }
     // Runs this as soon as the page is mounted - gets user data
     onMounted(async () => {
+        loading.value = true
+
         const userData = await $fetch('/api/user/getAllData')
         if (userData) {
             userInput.value = {
@@ -46,6 +48,8 @@
             updatedAt: new Date(userData.updatedAt)
             }
         }
+
+        loading.value = false
     })
     // Watches user input to enable save button when changes are present
     watch(userInput, (newVal) => {
@@ -58,7 +62,8 @@
             newVal.image != currentUser.value.image ||
             newVal.website != currentUser.value.website
     }, { deep: true })
-
+    // Helper functions and form handling stuff
+    // Changes DB
     async function deleteAccount() {
         const admins = await $fetch('/api/user/getAdminData')
         loading.value = true
@@ -80,20 +85,20 @@
         }
     }
 
-    function validateInput(signupInput: any): string {
+    function validateInput(updateInput: any): string {
         const emailRegex = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/
         const usernameRegex = /^[0-9A-Za-z\s-]{2,16}$/
         const passwordRegex = /^(?=.*?[A-Z])(?=.*?[0-9]).{8,}$/
-        const blognameRegex = /^[a-zA-Z0-9\s-]{2,50}$/
+        const websiteRegex = /^https?:\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?$/
         
-        if (!emailRegex.test(signupInput?.email)) {
+        if (updateInput.email && !emailRegex.test(updateInput.email)) {
             return 'The Email you entered is not valid.'
-        } else if (!usernameRegex.test(signupInput?.username)) {
-            return 'Username should be between 2 and 16 characters. Alphanumeric only.'
-        } else if (!passwordRegex.test(signupInput?.password)) {
-            return 'Password should be at least 8 characters including a number and uppercase letter'
-        } else if (!blognameRegex.test(signupInput?.blogname)) {
-            return 'Blog Name should be between 2 and 50 characters. Alphanumeric and spaces only.'
+        } else if (updateInput.name && !usernameRegex.test(updateInput.name)) {
+            return 'Username should be between 2 and 16 characters. Alphanumeric & spaces only.'
+        } else if (updateInput.password && !passwordRegex.test(updateInput.password)) {
+            return 'Password should be at least 8 characters including a number and uppercase letter.'
+        } else if (updateInput.website && !websiteRegex.test(updateInput.website)) {
+            return 'Make sure to include http(s) in your website URL. It must be a valid URL.'
         } else {
             return ''
         }
@@ -163,7 +168,7 @@
         }
         reader.readAsDataURL(file)
     }
-
+    // Changes DB
     async function updateProfile() {
         try {
             loading.value = true
@@ -210,18 +215,16 @@
 </script>
 
 <template>
+    <appNav />
     <div class="min-h-screen bg-bg py-8 px-4 sm:px-6 lg:px-8">
         <div class="max-w-4xl mx-auto">
             <h1 class="text-3xl font-extrabold text-text mb-8">Profile Settings</h1>
             
-            <!-- Error Alert -->
             <div v-if="error" class="mb-6 p-4 rounded-lg bg-red-500 bg-opacity-20">
                 <p class="text-sm text-red-400">{{ error }}</p>
             </div>
 
-            <!-- Profile Form -->
             <form @submit.prevent="updateProfile" class="space-y-6 bg-gray-700 bg-opacity-15 p-8 rounded-lg">
-                <!-- Name Input -->
                 <div>
                     <label class="block text-sm font-medium text-secondary opacity-70 mb-2">Name</label>
                     <input
@@ -229,16 +232,10 @@
                         type="text"
                         placeholder="Your name"
                         :disabled="loading"
-                        class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg 
-                               placeholder-secondary placeholder-opacity-25 
-                               focus:ring-secondary focus:ring-opacity-20
-                               text-text
-                               disabled:bg-opacity-10 disabled:cursor-not-allowed
-                               transition-all"
+                        class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20text-textdisabled:bg-opacity-5 disabled:cursor-not-allowedtransition-all"
                     />
                 </div>
 
-                <!-- Email Input -->
                 <div>
                     <label class="block text-sm font-medium text-secondary opacity-70 mb-2">Email</label>
                     <input
@@ -246,16 +243,10 @@
                         type="email"
                         placeholder="Your email"
                         :disabled="loading"
-                        class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg 
-                               placeholder-secondary placeholder-opacity-25 
-                               focus:ring-secondary focus:ring-opacity-20
-                               text-text
-                               disabled:bg-opacity-10 disabled:cursor-not-allowed
-                               transition-all"
+                        class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20text-textdisabled:bg-opacity-5 disabled:cursor-not-allowedtransition-all"
                     />
                 </div>
 
-                <!-- Password Input -->
                 <div>
                     <label class="block text-sm font-medium text-secondary opacity-70 mb-2">
                         New Password (leave empty to keep current)
@@ -265,16 +256,10 @@
                         type="password"
                         placeholder="New password"
                         :disabled="loading"
-                        class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg 
-                               placeholder-secondary placeholder-opacity-25 
-                               focus:ring-secondary focus:ring-opacity-20
-                               text-text
-                               disabled:bg-opacity-10 disabled:cursor-not-allowed
-                               transition-all"
+                        class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20text-textdisabled:bg-opacity-5 disabled:cursor-not-allowedtransition-all"
                     />
                 </div>
 
-                <!-- Profile Image URL -->
                 <input
                     type="file"
                     ref="dropZoneRef"
@@ -285,10 +270,19 @@
                     @change="handleFileUpload"
                     placeholder="Blog Header Image URL"
                 />
-                <label class="block text-sm font-medium text-secondary opacity-70 mb-2">Profile Image URL</label>
+                <label class="flex items-center text-sm font-medium text-secondary opacity-70 mb-2">Profile Image
+                    <button v-if="userInput.image" 
+                        @click.prevent="userInput.image = ''" 
+                        class="p-1 rounded-full"
+                    >
+                        <svg class="w-5 h-5 text-white hover:text-red-400 transition-colors" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </label>
                 <label 
                     for="fileInput" 
-                    class="flex justify-center items-center w-[45vw] h-[40vh] p-4 bg-gray-700 bg-opacity-15 border-2 border-dashed border-secondary border-opacity-25 rounded-lg text-center cursor-pointer hover:border-opacity-50 transition-all"
+                    class="flex justify-center items-center w-full h-[30vh] p-4 bg-gray-700 bg-opacity-15 border-2 border-dashed border-secondary border-opacity-25 rounded-lg text-center cursor-pointer hover:border-opacity-50 transition-all"
                     @dragover="handleDragOver"
                     @drop="handleDrop"
                 >   
@@ -303,11 +297,10 @@
                         v-if="userInput.image" 
                         :src="userInput.image" 
                         alt="Preview" 
-                        class="w-[90%] h-[90%] rounded"
+                        class="inline-block rounded-full ring-2 ring-secondary ring-opacity-20 w-[30%] aspect-square object-cover"
                     />
                 </label>
 
-                <!-- Website URL -->
                 <div>
                     <label class="block text-sm font-medium text-secondary opacity-70 mb-2">Website</label>
                     <input
@@ -315,34 +308,19 @@
                         type="url"
                         placeholder="Your website"
                         :disabled="loading"
-                        class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg 
-                               placeholder-secondary placeholder-opacity-25 
-                               focus:ring-secondary focus:ring-opacity-20
-                               text-text
-                               disabled:bg-opacity-10 disabled:cursor-not-allowed
-                               transition-all"
+                        class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20text-textdisabled:bg-opacity-5 disabled:cursor-not-allowedtransition-all"
                     />
                 </div>
 
-                <!-- Submit Button -->
                 <button 
                     type="submit" 
                     :disabled="loading || !hasChanges"
-                    class="w-full py-4 bg-primary text-lg font-medium rounded-lg 
-                           hover:bg-opacity-90 transition-all
-                           disabled:bg-gray-600 disabled:text-gray-400 
-                           disabled:cursor-not-allowed"
+                    class="w-full py-4 bg-primary text-lg font-medium rounded-lg hover:bg-opacity-90 transition-alldisabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed"
                 >
-                    {{ loading ? 'Saving...' : hasChanges ? 'Save Changes' : 'Saved' }}
+                    {{ loading ? 'Loading...' : hasChanges ? 'Save Changes' : 'Saved' }}
                 </button>
             </form>
 
-            <!-- Admin Dashboard -->
-            <div v-if="currentUser?.admin" class="mt-8">
-                <adminDashboard />
-            </div>
-
-            <!-- Danger Zone -->
             <div class="mt-8 bg-red-500 bg-opacity-10 p-8 rounded-lg">
                 <h2 class="text-xl font-bold text-red-400 mb-4">Danger Zone</h2>
                 <button 
@@ -352,7 +330,6 @@
                     Delete Account
                 </button>
                 
-                <!-- Delete Confirmation -->
                 <div v-if="wantsToDeleteAccount" class="mt-4 p-4 bg-red-500 bg-opacity-20 rounded-lg">
                     <p class="text-red-400 mb-4">Are you sure you want to delete your account?</p>
                     <div class="flex gap-4">
@@ -370,6 +347,11 @@
                         </button>
                     </div>
                 </div>
+            </div>
+
+            <div v-if="currentUser?.admin" class="mt-8">
+                <h1 class="text-3xl font-extrabold text-text mb-8">Admin Dashboard</h1>
+                <adminDashboard />
             </div>
         </div>
     </div>

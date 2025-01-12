@@ -140,7 +140,7 @@
 </script>
 
 <template>
-    <tempNav />
+    <appNav />
 
     <div v-if="loading">Loading blog...</div>
 

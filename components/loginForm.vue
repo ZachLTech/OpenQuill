@@ -1,5 +1,6 @@
 <script setup lang="ts">
     // All initial logic declarations
+    const config = useRuntimeConfig()
     const login = ref({ email: '', password: '' })
     const loading = ref(false)
     const error = ref('')
@@ -15,12 +16,11 @@
             const result = await signIn('credentials', {
                 email: login.value.email,
                 password: login.value.password,
-                redirect: false,
-                callbackUrl: '/profile'
+                redirect: false
             })
             
             if (result?.error) {
-                error.value = 'Invalid credentials'
+                error.value = `Error: ${result.error}`
                 console.error('Login failed:', result.error)
             } else {
                 navigateTo('/profile')
