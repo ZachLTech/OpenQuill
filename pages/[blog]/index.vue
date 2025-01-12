@@ -33,7 +33,6 @@
     let publishedPostsLoading = ref(false)
     let error = ref('')
     let blog = ref<Blog | null>(null)
-    let posts = ref<any | null>([])
     let unpublishedPosts = ref<any | null>([])
     let publishedPosts = ref<any | null>([])
     let totalUnpublishedPages = ref(0)
