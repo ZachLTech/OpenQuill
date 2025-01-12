@@ -2,8 +2,7 @@
     Body Structure:
     {
         page: number,
-        pageSize: number,
-        blog: blogTitle
+        pageSize: number
     }
 */
 
@@ -11,6 +10,12 @@ export default eventHandler(async event => {
     const body = await readBody(event)
 
     const posts = await event.context.prisma.post.findMany({
+        where: {
+            published: true
+        },
+        orderBy: {
+            createdAt: 'desc'
+        },
         skip: (body.page - 1)*body.pageSize,
         take: body.pageSize,
         select: {
@@ -30,9 +35,6 @@ export default eventHandler(async event => {
                     website: true
                 }
             }
-        },
-        where: {
-            blogId: body.blogId
         }
     })
 

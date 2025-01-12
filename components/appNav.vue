@@ -45,7 +45,7 @@
 </script>
 
 <template>
-    <nav class="w-full bg-gray-700 bg-opacity-15 py-4 px-6 mb-8">
+    <nav class="w-full bg-gray-700 bg-opacity-15 py-4 px-6 mb-2">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
             <NuxtLink 
                 to="/" 

@@ -115,9 +115,9 @@
             <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-800 border-t-primary"></div>
         </div>
         
-        <div v-else class="bg-gray-700 bg-opacity-15 rounded-lg overflow-hidden">
+        <div v-else class="bg-secondary bg-opacity-5 rounded-lg overflow-hidden">
             <table class="w-full">
-                <thead class="bg-gray-700 bg-opacity-50">
+                <thead class="bg-secondary bg-opacity-10">
                     <tr>
                         <th class="px-6 py-4 text-left text-sm font-medium text-text">Name</th>
                         <th class="px-6 py-4 text-left text-sm font-medium text-text">Email</th>
@@ -127,9 +127,9 @@
                         <th class="px-6 py-4 text-left text-sm font-medium text-text">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-700 divide-opacity-25">
+                <tbody class="divide-y divide-secondary divide-opacity-10">
                     <tr v-for="user in users" :key="user.id" 
-                        class="hover:bg-gray-700 hover:bg-opacity-25 transition-colors">
+                        class="hover:bg-secondary hover:bg-opacity-[0.02] transition-colors">
                         <td class="px-6 py-4 text-sm text-text">{{ user.name }}</td>
                         <td class="px-6 py-4 text-sm text-text">{{ user.email }}</td>
                         <td class="px-6 py-4 text-sm">

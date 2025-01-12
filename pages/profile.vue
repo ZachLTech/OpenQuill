@@ -247,7 +247,7 @@
                 </div>
             </div>
 
-            <form @submit.prevent="updateProfile" class="space-y-6 bg-gray-700 bg-opacity-15 p-8 rounded-lg">
+            <form @submit.prevent="updateProfile" class="space-y-6 bg-secondary bg-opacity-5 p-8 rounded-lg">
                 <div>
                     <label class="block text-sm font-medium text-secondary opacity-70 mb-2">Name</label>
                     <input
@@ -255,7 +255,7 @@
                         type="text"
                         placeholder="Your name"
                         :disabled="loading"
-                        class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20text-textdisabled:bg-opacity-5 disabled:cursor-not-allowedtransition-all"
+                        class="w-full p-4 bg-secondary bg-opacity-5 border-0 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20text-textdisabled:bg-opacity-5 disabled:cursor-not-allowedtransition-all"
                     />
                 </div>
 
@@ -266,7 +266,7 @@
                         type="email"
                         placeholder="Your email"
                         :disabled="loading"
-                        class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20text-textdisabled:bg-opacity-5 disabled:cursor-not-allowedtransition-all"
+                        class="w-full p-4 bg-secondary bg-opacity-5 border-0 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20text-textdisabled:bg-opacity-5 disabled:cursor-not-allowedtransition-all"
                     />
                 </div>
 
@@ -279,7 +279,7 @@
                         type="password"
                         placeholder="New password"
                         :disabled="loading"
-                        class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20text-textdisabled:bg-opacity-5 disabled:cursor-not-allowedtransition-all"
+                        class="w-full p-4 bg-secondary bg-opacity-5 border-0 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20text-textdisabled:bg-opacity-5 disabled:cursor-not-allowedtransition-all"
                     />
                 </div>
 
@@ -298,14 +298,14 @@
                         @click.prevent="userInput.image = ''" 
                         class="p-1 rounded-full"
                     >
-                        <svg class="w-5 h-5 text-white hover:text-red-400 transition-colors" viewBox="0 0 20 20" fill="currentColor">
+                        <svg class="w-5 h-5 text-text hover:text-red-400 transition-colors" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                         </svg>
                     </button>
                 </label>
                 <label 
                     for="fileInput" 
-                    class="flex justify-center items-center w-full h-[30vh] p-4 bg-gray-700 bg-opacity-15 border-2 border-dashed border-secondary border-opacity-25 rounded-lg text-center cursor-pointer hover:border-opacity-50 transition-all"
+                    class="flex justify-center items-center w-full h-[30vh] p-4 bg-secondary bg-opacity-5 border-2 border-dashed border-secondary border-opacity-25 rounded-lg text-center cursor-pointer hover:border-opacity-50 transition-all"
                     @dragover="handleDragOver"
                     @drop="handleDrop"
                 >   
@@ -331,7 +331,7 @@
                         type="url"
                         placeholder="Your website"
                         :disabled="loading"
-                        class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20text-textdisabled:bg-opacity-5 disabled:cursor-not-allowedtransition-all"
+                        class="w-full p-4 bg-secondary bg-opacity-5 border-0 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20text-textdisabled:bg-opacity-5 disabled:cursor-not-allowedtransition-all"
                     />
                 </div>
 
@@ -348,7 +348,7 @@
                 <h2 class="text-xl font-bold text-red-400 mb-4">Danger Zone</h2>
                 <button 
                     @click="wantsToDeleteAccount=true"
-                    class="px-4 py-2 bg-red-500 text-white rounded hover:bg-opacity-90 transition-all"
+                    class="px-4 py-2 bg-red-500 text-text rounded hover:bg-opacity-90 transition-all"
                 >
                     Delete Account
                 </button>
@@ -358,13 +358,13 @@
                     <div class="flex gap-4">
                         <button 
                             @click="deleteAccount()"
-                            class="px-4 py-2 bg-red-500 text-white rounded hover:bg-opacity-90 transition-all"
+                            class="px-4 py-2 bg-red-500 text-text rounded hover:bg-opacity-90 transition-all"
                         >
                             Yes, Delete
                         </button>
                         <button 
                             @click="wantsToDeleteAccount = false"
-                            class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-opacity-90 transition-all"
+                            class="px-4 py-2 bg-gray-600 text-text rounded hover:bg-opacity-90 transition-all"
                         >
                             Cancel
                         </button>

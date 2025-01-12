@@ -4,7 +4,16 @@ export default eventHandler(async event => {
             owner: {
                 select: {
                     image: true,
-                    name: true
+                    name: true,
+                    website: true
+                }
+            },
+            posts: {
+                where: {
+                    published: true
+                },
+                select: {
+                    id: true    
                 }
             }
         }

@@ -7,12 +7,18 @@
 
 export default eventHandler(async event => {
     const body = await readBody(event)
+    let postsLen = 0
 
-    const postsLen = await event.context.prisma.post.count({
-        where: {
-            blogId: body.blogId
-        }
-    })
+    if (body.blogId != '*') {
+        postsLen = await event.context.prisma.post.count({
+            where: {
+                blogId: body.blogId
+            }
+        })
+    }  else if (body.blogId == '*') {
+        postsLen = await event.context.prisma.post.count()
+    }
+    
     
     return postsLen
 })

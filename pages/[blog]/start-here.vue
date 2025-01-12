@@ -299,7 +299,7 @@
                 <textarea
                     id="description"
                     v-model="blogInput.blogDescription"
-                    class="w-[85vw] sm:w-[45vw] h-full sm:h-[40vh] p-4 bg-gray-700 border-0 bg-opacity-15 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20 text-text text-lg resize-y min-h-[100px] max-h-[400px] focus:outline-none"
+                    class="w-[85vw] sm:w-[45vw] h-full sm:h-[40vh] p-4 bg-secondary border-0 bg-opacity-5 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20 text-text text-lg resize-y min-h-[100px] max-h-[400px] focus:outline-none"
                     type="text"
                     placeholder="Describe your blog... What's it about? What can readers expect?"
                     :disabled="loading"
@@ -312,7 +312,7 @@
                         @click.prevent="blogInput.blogImage = ''" 
                         class="p-1 rounded-full"
                     >
-                        <svg class="w-5 h-5 text-white hover:text-red-400 transition-colors" viewBox="0 0 20 20" fill="currentColor">
+                        <svg class="w-5 h-5 text-text hover:text-red-400 transition-colors" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                         </svg>
                     </button>
@@ -329,7 +329,7 @@
                 />
                 <label 
                     for="fileInput" 
-                    class="flex justify-center items-center w-[45vw] h-[40vh] p-4 bg-gray-700 bg-opacity-15 border-2 border-dashed border-secondary border-opacity-25 rounded-lg text-center cursor-pointer hover:border-opacity-50 transition-all"
+                    class="flex justify-center items-center w-[45vw] h-[40vh] p-4 bg-secondary bg-opacity-5 border-2 border-dashed border-secondary border-opacity-25 rounded-lg text-center cursor-pointer hover:border-opacity-50 transition-all"
                     @dragover="handleDragOver"
                     @drop="handleDrop"
                 >   
@@ -352,9 +352,9 @@
                 <div class="flex flex-col">
                     <h1 class="text-3xl text-center font-extrabold tracking-tight text-text sm:text-4xl">Now some tags to make your blog unique 🏷️</h1>
                     <label for="description" class="mt-[5vh] mb-2 text-lg text-secondary opacity-15">Add some Blog Tags (Optional)</label>
-                    <div class="relative w-[85vw] sm:w-[45vw] min-h-[50px] p-2 bg-gray-700 bg-opacity-15 rounded-lg flex flex-wrap gap-2 items-center">
+                    <div class="relative w-[85vw] sm:w-[45vw] min-h-[50px] p-2 bg-secondary bg-opacity-5 rounded-lg flex flex-wrap gap-2 items-center">
                         <span v-for="(tag, index) in blogInput.blogTags" :key="index" 
-                            class="bg-secondary bg-opacity-15 text-text px-3 py-1 rounded flex items-center gap-2">
+                            class="bg-secondary bg-opacity-5 text-text px-3 py-1 rounded flex items-center gap-2">
                             {{ tag }}
                             <button @click="blogInput.blogTags.splice(index, 1)" type="button" 
                                 class="hover:text-red-400 transition-colors text-xs">
@@ -389,16 +389,16 @@
             <div class="absolute flex items-center gap-12 bottom-10">
                 <button type="button" @click="step--" class="py-3 px-8 border text-gray-400 border-primary rounded hover:border-opacity-70 disabled:border-gray-600 disabled:hover:cursor-not-allowed transition-all" :disabled="step==1">Back</button>
                 <div class="flex h-full gap-4">
-                    <div class="h-4 w-4 rounded-full bg-gray-700 bg-opacity-25">
+                    <div class="h-4 w-4 rounded-full bg-secondary bg-opacity-25">
                         <div v-if="step==1" class="w-full h-full bg-primary border-4 border-gray-700 rounded-full"></div>
                     </div>
-                    <div class="h-4 w-4 rounded-full bg-gray-700 bg-opacity-25">
+                    <div class="h-4 w-4 rounded-full bg-secondary bg-opacity-25">
                         <div v-if="step==2" class="w-full h-full bg-primary border-4 border-gray-700 rounded-full"></div>
                     </div>
-                    <div class="h-4 w-4 rounded-full bg-gray-700 bg-opacity-25">
+                    <div class="h-4 w-4 rounded-full bg-secondary bg-opacity-25">
                         <div v-if="step==3" class="w-full h-full bg-primary border-4 border-gray-700 rounded-full"></div>
                     </div>
-                    <div class="h-4 w-4 rounded-full bg-gray-700 bg-opacity-25">
+                    <div class="h-4 w-4 rounded-full bg-secondary bg-opacity-25">
                         <div v-if="step==4" class="w-full h-full bg-primary border-4 border-gray-700 rounded-full"></div>
                     </div>
                 </div>
@@ -423,7 +423,7 @@
         </h2>
         <NuxtLink 
             :to="`/${blogInput.blogTitle}`"
-            class="px-8 py-4 text-xl font-semibold text-white bg-primary rounded-lg hover:bg-opacity-90 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+            class="px-8 py-4 text-xl font-semibold text-text bg-primary rounded-lg hover:bg-opacity-90 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
             Visit Your New Blog
         </NuxtLink>
     </div>
