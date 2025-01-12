@@ -32,7 +32,8 @@ export default eventHandler(async event => {
             }
         },
         where: {
-            blogId: body.blogId
+            blogId: body.blogId,
+            published: true
         }
     })
 

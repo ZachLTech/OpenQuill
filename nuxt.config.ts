@@ -16,7 +16,8 @@ export default defineNuxtConfig({
     allowSignups: process.env.ALLOW_SIGNUPS,
     public: {
       baseURL: process.env.BASE_URL || `http://localhost:${process.env.PORT}`,
-      firstBlogAutoRedirect: process.env.ENABLE_SINGLE_BLOG_AUTO_REDIRECT
+      firstBlogAutoRedirect: process.env.ENABLE_SINGLE_BLOG_AUTO_REDIRECT,
+      platformTitle: process.env.PLATFORM_TITLE
     }
   },
 

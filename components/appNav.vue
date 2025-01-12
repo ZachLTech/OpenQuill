@@ -21,6 +21,7 @@
 
     const { status, signOut } = useAuth()
     const route = useRoute()
+    const platformTitle = ref(useRuntimeConfig().public.platformTitle)
     const props = defineProps<{
         user?: fullUser
     }>()
@@ -49,9 +50,9 @@
         <div class="max-w-6xl mx-auto flex justify-between items-center">
             <NuxtLink 
                 to="/" 
-                class="text-xl font-bold text-text hover:text-primary transition-colors"
+                class="text-xl font-bold text-text hover:text-opacity-60 transition-colors"
             >
-                Home
+                {{ platformTitle }}
             </NuxtLink>
 
             <div class="flex items-center gap-6">

@@ -12,11 +12,16 @@ export default eventHandler(async event => {
     if (body.blogId != '*') {
         postsLen = await event.context.prisma.post.count({
             where: {
-                blogId: body.blogId
+                blogId: body.blogId,
+                published: true
             }
         })
     }  else if (body.blogId == '*') {
-        postsLen = await event.context.prisma.post.count()
+        postsLen = await event.context.prisma.post.count({
+            where: {
+                published: true
+            }
+        })
     }
     
     

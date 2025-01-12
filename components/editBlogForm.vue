@@ -1,56 +1,104 @@
 <script setup lang="ts">
-    // All initial logic declarations
-    const props = defineProps<{
-        blog: {
-            id: string;
-            title: string;
-            description: string | null;
-            imageURL: string | null;
-            tags: string[];
+    type Blog = {
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        ownerId: string;
+        title: string;
+        description: string | null;
+        imageURL: string | null;
+        tags: string[];
+        owner: {
+            name: string;
+            image: string | null;
+            website: string | null;
         }
-    }>()
-    const emit = defineEmits(['close', 'update'])
-    const error = ref('')
-    const loading = ref(false)
-    const blogInput = ref({
-        blogTitle: props.blog.title,
-        blogDescription: props.blog.description || '',
-        blogImage: props.blog.imageURL || '',
-        blogTags: props.blog.tags || []
-    })
-    // Form handling and helper functions
-    function checkSize(input: any, inputName: string, size: number) {
-        if (input) {
-            try {
-                let inputSize = 0;
-                if (Array.isArray(input)) {    
-                    inputSize = input.reduce((total, item) => {
-                        return total + new Blob([item]).size;
-                    }, 0);
-                } else {
-                    inputSize = new Blob([input]).size;
-                }
-                if (inputSize > size * 1024 * 1024) {
-                    return `Your inputted ${inputName} is too large. There is a ${size}MB maximum for this input field.`;
-                }
-                return '';
-            } catch (e) {
-                console.error(`ERROR: ${e}`);
-                return `Something went wrong while checking input size...`;
-            }
-        }
-        return '';
     }
 
-    function validateInput(blogInput: any): string { 
-        const blognameRegex = /^[a-zA-Z0-9\s-]{2,50}$/
-        const descriptionTooBig = checkSize(blogInput.blogDescription, 'blog description', 15)
-        const tagsTooBig = checkSize(blogInput.blogTags, 'total blog tag size', 0.001)
+    const props = defineProps<{
+        blog: Blog
+    }>()
 
-        if (!blognameRegex.test(blogInput.blogTitle)) return 'Blog Name should be between 2 and 50 characters. Alphanumeric and spaces only.'
-        if (descriptionTooBig) return descriptionTooBig
-        if (tagsTooBig) return tagsTooBig
-        return ''
+    const emit = defineEmits(['close', 'update'])
+    const dropZoneRef = ref<HTMLDivElement>()
+    const hasChanges = ref(false)
+
+    const formData = ref({
+        title: props.blog.title,
+        description: props.blog.description || '',
+        imageURL: props.blog.imageURL || '',
+        tags: props.blog.tags || []
+    })
+
+    const originalBlog = ref({
+        title: props.blog.title,
+        description: props.blog.description || '',
+        imageURL: props.blog.imageURL || '',
+        tags: props.blog.tags || []
+    })
+
+    watch(formData, (newVal) => {
+        hasChanges.value = 
+            newVal.title !== originalBlog.value.title || 
+            newVal.description !== originalBlog.value.description || 
+            newVal.imageURL !== originalBlog.value.imageURL || 
+            JSON.stringify(newVal.tags) !== JSON.stringify(originalBlog.value.tags)
+    }, { deep: true })
+
+    const tagInput = ref<HTMLInputElement | null>(null)
+    const loading = ref(false)
+    const error = ref('')
+
+    function handleTagInput(event: Event) {
+        const target = event.target as HTMLInputElement
+        const value = target.value
+
+        if (!value) return
+
+        if (value.includes(',')) {
+            const newTags = value
+                .split(',')
+                .map(tag => tag.trim())
+                .filter(tag => tag && !formData.value.tags.includes(tag))
+
+            if (newTags.length > 0) {
+                formData.value.tags.push(...newTags)
+            }
+            
+            target.value = ''
+        }
+    }
+
+    function handleTagKeydown(event: KeyboardEvent) {
+        const target = event.target as HTMLInputElement
+        const value = target.value.trim()
+
+        if (event.key === ',' && value) {
+            event.preventDefault()
+            if (!formData.value.tags.includes(value)) {
+                formData.value.tags.push(value)
+            }
+            target.value = ''
+        }
+    }
+
+    function removeTag(tag: string) {
+        formData.value.tags = formData.value.tags.filter(t => t !== tag)
+    }
+
+    function handleDragOver(event: DragEvent) {
+        event.preventDefault()
+        event.stopPropagation()
+    }
+
+    function handleDrop(event: DragEvent) {
+        event.preventDefault()
+        event.stopPropagation()
+        
+        const files = event.dataTransfer?.files
+        if (files && files.length > 0) {
+            handleFileUpload({ target: { files: files } } as unknown as Event)
+        }
     }
 
     async function handleFileUpload(event: Event) {
@@ -60,10 +108,12 @@
         const file = input.files?.[0]
         
         if (!file) return
+
         if (!allowedFiletypes.includes(file.type)) {
             error.value = `Please upload a valid image file (JPEG, PNG, WEBP, or GIF)`
             return
         }
+        
         if (file.size >= 15 * 1024 * 1024) {
             error.value = 'File size cannot exceed 15MB.'
             return
@@ -71,43 +121,27 @@
 
         const reader = new FileReader()
         reader.onload = (e) => {
-            blogInput.value.blogImage = e.target?.result as string
+            formData.value.imageURL = e.target?.result as string
         }
         reader.readAsDataURL(file)
     }
 
-    async function handleUpdate() {
+    async function handleSubmit() {
         try {
             loading.value = true
-            error.value = ''
-
-            const currentUser = await $fetch('/api/user/getAllData')
-
-            if (currentUser && currentUser.frozen) {
-                error.value = 'You can\'t do this. Your account is currently frozen.'
-                return
-            }
-
-            blogInput.value.blogTitle = blogInput.value.blogTitle.trim()
-            blogInput.value.blogDescription = blogInput.value.blogDescription.trim()
-            blogInput.value.blogImage = blogInput.value.blogImage.trim()
-            blogInput.value.blogTags = blogInput.value.blogTags.map(tag => tag.trim())
-
-            error.value = await validateInput(blogInput.value)
-            if (error.value) return
-
-            const data = await $fetch('/api/blog/update', {
+            const response = await $fetch('/api/blog/update', {
                 method: 'POST',
-                body: blogInput.value
+                body: {
+                    blogTitle: formData.value.title,
+                    blogDescription: formData.value.description,
+                    blogImage: formData.value.imageURL,
+                    blogTags: formData.value.tags
+                }
             })
-
-            if (data) {
-                emit('update')
-                emit('close')
-            }
+            emit('update', response)
+            emit('close')
         } catch (e: any) {
-            error.value = e?.response?._data?.message || 'Failed to update blog'
-            console.error('Blog update error:', e)
+            error.value = e.message || 'Failed to update blog'
         } finally {
             loading.value = false
         }
@@ -115,74 +149,139 @@
 </script>
 
 <template>
-    <h2>Edit Blog</h2>
-    
-    <div v-if="error">{{ error }}</div>
+    <div class="bg-secondary bg-opacity-5 rounded-xl p-6">
+        <form @submit.prevent="handleSubmit" class="space-y-6">
+            <!-- Title -->
+            <div>
+                <label for="title" class="block text-sm font-medium text-text mb-2">
+                    Blog Title
+                </label>
+                <input
+                    id="title"
+                    v-model="formData.title"
+                    type="text"
+                    required
+                    class="w-full px-4 py-2 rounded-lg bg-secondary bg-opacity-10 text-text placeholder-gray-400 border-2 border-secondary border-opacity-10 focus:outline-none focus:ring-0 focus:border-secondary focus:border-opacity-20"
+                    placeholder="Enter blog title"
+                >
+            </div>
 
-    <form @submit.prevent="handleUpdate">
-        <div>
-            <label>Blog Name</label>
-            <input
-                v-model="blogInput.blogTitle"
-                type="text"
-                placeholder="Blog Name"
-                :disabled="loading"
-            />
-        </div>
+            <!-- Description -->
+            <div>
+                <label for="description" class="block text-sm font-medium text-text mb-2">
+                    Description
+                </label>
+                <textarea
+                    id="description"
+                    v-model="formData.description"
+                    rows="6"
+                    class="w-full px-4 py-2 rounded-lg bg-secondary bg-opacity-10 text-text placeholder-gray-400 border-2 border-secondary border-opacity-10 focus:outline-none focus:ring-0 focus:border-secondary focus:border-opacity-20"
+                    placeholder="Enter blog description"
+                ></textarea>
+            </div>
 
-        <div>
-            <label>Description</label>
-            <input
-                v-model="blogInput.blogDescription"
-                type="text"
-                placeholder="Blog Description"
-                :disabled="loading"
-            />
-        </div>
+            <!-- Image Upload -->
+            <div>
+                <label class="flex items-center text-sm font-medium text-text mb-2">Blog Image
+                    <button v-if="formData.imageURL" 
+                        @click.prevent="formData.imageURL = ''" 
+                        class="p-1 rounded-full"
+                    >
+                        <svg class="w-4 h-4 text-text hover:text-red-400 transition-colors" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </label>
+                <div class="flex items-center">
+                    <input
+                        type="file"
+                        ref="dropZoneRef"
+                        accept="image/*"
+                        class="hidden" 
+                        id="blogImageInput"
+                        :disabled="loading"
+                        @change="handleFileUpload"
+                    />
+                    <label 
+                        for="blogImageInput" 
+                        class="flex justify-center items-center w-full h-[30vh] p-4 bg-secondary bg-opacity-5 border-2 border-dashed border-secondary border-opacity-25 rounded-lg text-center cursor-pointer hover:border-opacity-50 transition-all"
+                        @dragover="handleDragOver"
+                        @drop="handleDrop"
+                    >   
+                        <div v-if="!formData.imageURL" class="h-full flex flex-col items-center justify-center">
+                            <svg class="w-16 h-16 mb-4 text-secondary opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                            <span class="text-secondary text-lg opacity-50">Click to upload or drag and drop</span>
+                            <span class="text-md text-secondary opacity-40 mt-2">JPEG, PNG, WEBP or GIF (max. 15MB)</span>
+                        </div>
+                        <img 
+                            v-if="formData.imageURL" 
+                            :src="formData.imageURL" 
+                            alt="Preview" 
+                            class="h-full w-full object-contain rounded"
+                        />
+                    </label>
+                </div>
+            </div>
 
-        <div>
-            <label>Header Image</label>
-            <input
-                type="file"
-                accept="image/*"
-                @change="handleFileUpload"
-                :disabled="loading"
-            />
-            <img 
-                v-if="blogInput.blogImage" 
-                :src="blogInput.blogImage" 
-                alt="Preview" 
-                width="300px"
-                height="120px"
-            />
-        </div>
+            <!-- Tags -->
+            <div>
+                <label class="block text-sm font-medium text-text mb-2">
+                    Tags
+                </label>
+                <div class="flex flex-wrap gap-2 mb-2">
+                    <span
+                        v-for="tag in formData.tags"
+                        :key="tag"
+                        class="px-3 py-1 text-sm bg-secondary bg-opacity-10 rounded-lg text-text flex items-center"
+                    >
+                        {{ tag }}
+                        <button
+                            @click.prevent="removeTag(tag)"
+                            class="ml-2 text-text text-opacity-25 hover:text-red-500 transition-colors"
+                        >
+                            ×
+                        </button>
+                    </span>
+                </div>
+                <div class="flex gap-2">
+                    <div class="relative w-full min-h-[20px] p-1 bg-secondary bg-opacity-10 rounded-lg flex flex-wrap gap-2 items-center">
+                        <input
+                            ref="tagInput"
+                            @input="handleTagInput"
+                            @keydown="handleTagKeydown"
+                            type="text"
+                            class="flex-grow bg-transparent border-none focus:outline-none text-text p-2 focus:ring-secondary focus:ring-opacity-20 rounded"
+                            placeholder="Type tags and press comma to add..."
+                            :disabled="loading"
+                        />
+                    </div>
+                </div>
+            </div>
 
-        <div>
-            <label>Tags</label>
-            <input
-                v-model="blogInput.blogTags"
-                type="text"
-                placeholder="Tags (comma-separated)"
-                @input="blogInput.blogTags = ($event.target as HTMLInputElement).value.split(',')"
-                :disabled="loading"
-            />
-        </div>
+            <!-- Error Message -->
+            <div v-if="error" class="text-red-400 text-sm">
+                {{ error }}
+            </div>
 
-        <div>
-            <button type="button" @click="emit('close')" :disabled="loading">
-                Cancel
-            </button>
-            <button 
-                type="submit" 
-                :disabled="loading || (
-                    blogInput.blogTitle === blog.title &&
-                    blogInput.blogDescription === (blog.description || '') &&
-                    blogInput.blogImage === (blog.imageURL || '') &&
-                    JSON.stringify(blogInput.blogTags) === JSON.stringify(blog.tags)
-                )"
-            >
-                {{ loading ? 'Saving...' : 'Save Changes' }}
-            </button>
-        </div>
-    </form>
+            <!-- Form Actions -->
+            <div class="flex justify-end space-x-4">
+                <button
+                    type="button"
+                    @click="emit('close')"
+                    class="px-4 py-2 bg-secondary bg-opacity-10 rounded-lg hover:bg-opacity-20 transition-all"
+                >
+                    Cancel
+                </button>
+                <button
+                    type="submit"
+                    :disabled="loading || !hasChanges"
+                    class="px-4 py-2 bg-primary rounded-lg hover:bg-opacity-90 transition-all disabled:opacity-50"
+                >
+                    {{ loading ? 'Saving...' : 'Save Changes' }}
+                </button>
+            </div>
+        </form>
+    </div>
 </template>

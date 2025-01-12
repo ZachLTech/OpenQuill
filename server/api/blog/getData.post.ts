@@ -11,6 +11,15 @@ export default eventHandler(async event => {
     const blogData = await event.context.prisma.blog.findUnique({
         where: {
             title: body.blogTitle
+        },
+        include: {
+            owner: {
+                select: {
+                    name: true,
+                    image: true,
+                    website: true,
+                }
+            }
         }
     })
 

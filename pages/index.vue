@@ -78,12 +78,12 @@
     async function fetchRecentPosts() {
         try {
             postsLoading.value = true
-            totalPages = (await $fetch('/api/blog/posts/length', {
+            totalPages = Math.ceil((await $fetch('/api/blog/posts/publishedLength', {
                 method: 'POST',
                 body: {
                     blogId: '*'
                 }
-            })) / 6
+            })) / 6)
             const recentPostsResponse = await $fetch('/api/blog/posts/getRecent', {
                 method: 'POST',
                 body: {
@@ -202,7 +202,7 @@
                             >
                                 Back
                             </button>
-                            <span class="text-text text-opacity-25 px-4 py-2">Page {{ currentPage }}</span>
+                            <span class="text-text text-opacity-25 px-4 py-2">Page {{ currentPage }} / {{ totalPages }}</span>
                             <button 
                                 @click="currentPage++"
                                 :disabled="recentPosts.length < pageSize"
@@ -266,7 +266,12 @@
                             </div>
                         </NuxtLink>
                     </div>
-                </div>
+                </div>    
+                <footer class="w-full mt-8 pt-4 border-t border-text border-opacity-25 flex justify-center">
+                    <div class="mt-2">
+                        <p class="text-text text-opacity-20">Powered by <a href="https://github.com/ZachLTech/blogz" class="underline" target="_blank">OpenQuill</a> - Open Source Blogging Platform</p>
+                    </div>
+                </footer>
             </div>
         </div>
     </div>
