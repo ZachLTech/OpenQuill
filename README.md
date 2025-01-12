@@ -7,7 +7,11 @@ This is gonna be a simple yet versatile self-hosted blog platform for anyone to 
 
 Things I want to implement eventually:
 - hiding blogs
+- custom blog sitewide configs
+- user customizable blog color schemes
+- light mode maybe
+- optimize by adding admin, frozen, and other user variables to jwt token to minimize DB queries
 
 TODO: 
-- make freezing people actually do something
 - 
+

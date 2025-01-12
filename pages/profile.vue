@@ -6,6 +6,7 @@
     const { status, signOut } = useAuth()
     const loading = ref(false)
     const error = ref('')
+    const success = ref('')
     const hasChanges = ref(false)
     const wantsToDeleteAccount = ref(false)
     const currentUser = ref<User | null>(null)
@@ -204,7 +205,7 @@
 
             if (updatedUser) {
                 hasChanges.value = false
-                error.value = 'Profile updated successfully!'
+                success.value = 'Profile updated successfully!'
             }
         } catch (e: any) {
             error.value = e?.response?._data?.message || 'Failed to update profile'
@@ -220,8 +221,30 @@
         <div class="max-w-4xl mx-auto">
             <h1 class="text-3xl font-extrabold text-text mb-8">Profile Settings</h1>
             
-            <div v-if="error" class="mb-6 p-4 rounded-lg bg-red-500 bg-opacity-20">
-                <p class="text-sm text-red-400">{{ error }}</p>
+            <div v-if="error" class="w-full flex justify-center">
+                <div class="w-full mb-2 p-4 rounded-lg bg-red-500 bg-opacity-20 flex">
+                    <button @click="error=''" class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-400">{{ error }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div v-if="success" class="w-full flex justify-center">
+                <div class="w-full mb-2 p-4 rounded-lg bg-green-500 bg-opacity-20 flex">
+                    <button @click="success=''" class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-green-400">{{ success }}</h3>
+                    </div>
+                </div>
             </div>
 
             <form @submit.prevent="updateProfile" class="space-y-6 bg-gray-700 bg-opacity-15 p-8 rounded-lg">

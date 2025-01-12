@@ -26,9 +26,6 @@ export default eventHandler(async (event) => {
     return { 
         id: user.id,
         email: user.email,
-        name: user.name,
-        admin: user.admin,
-        frozen: user.frozen,
-        image: user.image,
+        name: user.name
     }
 })

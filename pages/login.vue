@@ -7,6 +7,6 @@
 </script>
 
 <template>
-    <!-- <appNav /> -->
+    <appNav />
     <loginForm class="mt-[15vh]" />
 </template>

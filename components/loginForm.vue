@@ -20,7 +20,8 @@
             })
             
             if (result?.error) {
-                error.value = `Error: ${result.error}`
+                // error.value = `Error: ${result.error}`
+                error.value = `Invalid credentials`
                 console.error('Login failed:', result.error)
             } else {
                 navigateTo('/profile')
