@@ -275,14 +275,14 @@
 
 <template>
     <div v-if="error" class="p-4 w-screen flex justify-center absolute">
-        <div class="w-full p-4 rounded-lg bg-red-500 bg-opacity-20 flex">
+        <div class="w-full p-4 rounded-lg bg-red-500 sm:bg-opacity-20 flex">
             <button @click="error=''" class="flex-shrink-0">
-                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <svg class="h-5 w-5 sm:text-red-400" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                 </svg>
             </button>
             <div class="ml-3">
-                <h3 class="text-sm font-medium text-red-400">{{ error }}</h3>
+                <h3 class="text-sm font-medium sm:text-red-400">{{ error }}</h3>
             </div>
         </div>
     </div>
@@ -292,9 +292,9 @@
     </div>
 
     <div v-else-if="initializing">
-        <form @submit.prevent="handleInitialize" class="w-screen h-screen flex justify-center items-center">
-            <div v-if="step==1" class="h-[60vh] flex flex-col">
-                <h1 class="text-3xl text-center font-extrabold tracking-tight text-text sm:text-4xl">Let's spiffy up your blog a little 😉</h1>
+        <form @submit.prevent="handleInitialize" class="w-screen h-screen flex justify-center pt-12 sm:pt-0 sm:items-center">
+            <div v-if="step==1" class="sm:h-[60vh] flex flex-col items-center sm:items-baseline">
+                <h1 class="text-3xl text-center font-extrabold tracking-tight text-text self-center sm:text-4xl">Let's spiffy up your blog a little 😉</h1>
                 <label for="description" class="mt-[5vh] mb-2 text-lg text-secondary opacity-15">Add a Blog Description</label>
                 <textarea
                     id="description"
@@ -305,8 +305,8 @@
                     :disabled="loading"
                 />
             </div>
-            <div v-if="step==2" class="h-[60vh] flex flex-col">
-                <h1 class="text-3xl text-center font-extrabold tracking-tight text-text sm:text-4xl">How about a banner image for your blog 🤨</h1>
+            <div v-if="step==2" class="sm:h-[60vh] flex flex-col items-center sm:items-baseline">
+                <h1 class="text-3xl text-center font-extrabold tracking-tight text-text sm:text-4xl self-center">How about a banner image for your blog 🤨</h1>
                 <label for="description" class="mt-[5vh] mb-2 text-lg text-secondary opacity-15 flex items-center">Add a Blog Banner Image (Optional)
                     <button v-if="blogInput.blogImage" 
                         @click.prevent="blogInput.blogImage = ''" 
@@ -329,7 +329,7 @@
                 />
                 <label 
                     for="fileInput" 
-                    class="flex justify-center items-center w-[45vw] h-[40vh] p-4 bg-secondary bg-opacity-5 border-2 border-dashed border-secondary border-opacity-25 rounded-lg text-center cursor-pointer hover:border-opacity-50 transition-all"
+                    class="flex justify-center items-center w-[90vw] sm:w-[45vw] h-[50vh] sm:h-[40vh] p-4 bg-secondary bg-opacity-5 border-2 border-dashed border-secondary border-opacity-25 rounded-lg text-center cursor-pointer hover:border-opacity-50 transition-all"
                     @dragover="handleDragOver"
                     @drop="handleDrop"
                 >   
@@ -348,9 +348,9 @@
                     />
                 </label>
             </div>
-            <div v-if="step==3" class="h-[60vh] flex flex-col">
-                <div class="flex flex-col">
-                    <h1 class="text-3xl text-center font-extrabold tracking-tight text-text sm:text-4xl">Now some tags to make your blog unique 🏷️</h1>
+            <div v-if="step==3" class="h-[60vh] flex flex-col items-center sm:items-baseline">
+                <div class="flex flex-col items-center sm:items-baseline">
+                    <h1 class="text-3xl text-center font-extrabold tracking-tight text-text sm:text-4xl self-center">Now some tags to make your blog unique 🏷️</h1>
                     <label for="description" class="mt-[5vh] mb-2 text-lg text-secondary opacity-15">Add some Blog Tags (Optional)</label>
                     <div class="relative w-[85vw] sm:w-[45vw] min-h-[50px] p-2 bg-secondary bg-opacity-5 rounded-lg flex flex-wrap gap-2 items-center">
                         <span v-for="(tag, index) in blogInput.blogTags" :key="index" 
@@ -373,20 +373,20 @@
                     </div>
                 </div>
             </div>
-            <div v-if="step==4" class="h-[60vh] flex flex-col items-center">
+            <div v-if="step==4" class="h-[60vh] flex flex-col items-center mt-[20vh] sm:mt-0">
                 <h1 class="text-3xl text-center font-extrabold tracking-tight text-text sm:text-4xl">Almost There ❗❗</h1>
-                <p class="text-lg text-center text-secondary opacity-70 mt-8 mb-8">
+                <p class="max-w-[90%] sm:max-w-full text-lg text-center text-secondary opacity-70 mt-8 mb-8">
                     Ready to create your blog? Click below to finish setup!
                 </p>
                 <button 
                     type="submit" 
                     :disabled="loading"
-                    class="w-full py-4 bg-primary text-lg font-medium rounded-lg hover:bg-opacity-90 transition-all disabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed"
+                    class="w-[90%] sm:w-full py-4 bg-primary text-lg font-medium rounded-lg hover:bg-opacity-90 transition-all disabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed"
                 >
                     {{ loading ? 'Processing...' : 'Initialize Blog' }}
                 </button>
             </div>
-            <div class="absolute flex items-center gap-12 bottom-10">
+            <div class="absolute flex items-center gap-4 sm:gap-12 -bottom-10 sm:bottom-10">
                 <button type="button" @click="step--" class="py-3 px-8 border text-gray-400 border-primary rounded hover:border-opacity-70 disabled:border-gray-600 disabled:hover:cursor-not-allowed transition-all" :disabled="step==1">Back</button>
                 <div class="flex h-full gap-4">
                     <div class="h-4 w-4 rounded-full bg-secondary bg-opacity-25">
@@ -418,7 +418,7 @@
                 animationDelay: `${Math.random() * 3}s`
             }"
         ></div>
-        <h2 class="text-4xl font-bold text-text animate-bounce">
+        <h2 class="text-3xl sm:text-4xl font-bold text-text animate-bounce">
             🎉 Your Blog is Ready! 🎉
         </h2>
         <NuxtLink 

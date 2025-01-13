@@ -316,7 +316,7 @@
                     :alt="blog.title"
                     class="w-full h-full object-cover"
                 >
-                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/70 to-transparent"></div>
                 <div class="absolute bottom-0 left-0 p-8">
                     <h1 class="text-4xl font-bold text-white mb-2">{{ blog.title }}</h1>
                     <p v-if="blog.description" class="max-h-[190px] text-lg text-gray-200 line-clamp-6">{{ blog.description }}</p>
@@ -332,7 +332,7 @@
                     class="w-12 h-12 rounded-full"
                 >
                 <div>
-                    <h2 class="text-lg font-semibold text-text">{{ blog.owner.name }}</h2>
+                    <h2 class="text-lg font-semibold text-text">{{ blog.owner.name }} - Author</h2>
                     <a 
                         v-if="blog.owner.website" 
                         :href="blog.owner.website"

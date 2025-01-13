@@ -13,6 +13,9 @@ export default eventHandler(async event => {
     const posts = await event.context.prisma.post.findMany({
         skip: (body.page - 1)*body.pageSize,
         take: body.pageSize,
+        orderBy: {
+            createdAt: 'desc'
+        },
         select: {
             id: true,
             ownerId: true,

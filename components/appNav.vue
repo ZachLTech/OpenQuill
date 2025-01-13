@@ -56,13 +56,7 @@
             </NuxtLink>
 
             <div class="flex items-center gap-6">
-                <div v-if="status === 'authenticated'" class="flex items-center gap-6">
-                    <NuxtLink 
-                        to="/" 
-                        :class="`text-${isActive('/') ? 'primary' : 'text'} hover:text-primary transition-colors`"
-                    >
-                        Home
-                    </NuxtLink>
+                <div v-if="status === 'authenticated'" class="flex items-center gap-2 sm:gap-6">
                     <NuxtLink 
                         v-if="userBlogPath"
                         :to="userBlogPath"

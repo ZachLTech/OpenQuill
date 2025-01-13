@@ -106,7 +106,7 @@
 </script>
 
 <template>
-    <div class="bg-bg">
+    <div class="bg-bg w-full">
         <div v-if="error" class="mb-6 p-4 rounded-lg bg-red-500 bg-opacity-20">
             <p class="text-sm text-red-400">{{ error }}</p>
         </div>
@@ -115,24 +115,24 @@
             <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-800 border-t-primary"></div>
         </div>
         
-        <div v-else class="bg-secondary bg-opacity-5 rounded-lg overflow-hidden">
-            <table class="w-full">
+        <div v-else class="bg-secondary bg-opacity-5 rounded-lg overflow-x-auto">
+            <table class="min-w-full">
                 <thead class="bg-secondary bg-opacity-10">
                     <tr>
-                        <th class="px-6 py-4 text-left text-sm font-medium text-text">Name</th>
-                        <th class="px-6 py-4 text-left text-sm font-medium text-text">Email</th>
-                        <th class="px-6 py-4 text-left text-sm font-medium text-text">Blog</th>
-                        <th class="px-6 py-4 text-left text-sm font-medium text-text">Created</th>
-                        <th class="px-6 py-4 text-left text-sm font-medium text-text">Status</th>
-                        <th class="px-6 py-4 text-left text-sm font-medium text-text">Actions</th>
+                        <th class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-medium text-text whitespace-nowrap">Name</th>
+                        <th class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-medium text-text whitespace-nowrap">Email</th>
+                        <th class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-medium text-text whitespace-nowrap">Blog</th>
+                        <th class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-medium text-text whitespace-nowrap">Created</th>
+                        <th class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-medium text-text whitespace-nowrap">Status</th>
+                        <th class="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs sm:text-sm font-medium text-text whitespace-nowrap">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-secondary divide-opacity-10">
                     <tr v-for="user in users" :key="user.id" 
                         class="hover:bg-secondary hover:bg-opacity-[0.02] transition-colors">
-                        <td class="px-6 py-4 text-sm text-text">{{ user.name }}</td>
-                        <td class="px-6 py-4 text-sm text-text">{{ user.email }}</td>
-                        <td class="px-6 py-4 text-sm">
+                        <td class="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-text whitespace-nowrap">{{ user.name }}</td>
+                        <td class="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-text whitespace-nowrap">{{ user.email }}</td>
+                        <td class="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm whitespace-nowrap">
                             <NuxtLink 
                                 v-if="user.blog" 
                                 :to="`/${user.blog.title}`"
