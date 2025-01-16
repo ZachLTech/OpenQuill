@@ -1,10 +1,15 @@
 <script setup lang="ts">
     // Types
+    import { marked } from 'marked'
     import type { Post, Image, User as FullUser } from '@prisma/client'
     type User = {
         id: string,
         email: string,
         name: string
+    }
+    interface PendingImages {
+        files: File[];
+        currentIndex: number;
     }
     // All initial logic declarations
     const { status, data } = useAuth()
@@ -21,8 +26,11 @@
     const newAltText = ref<string | null>('')
     const hasChanges = ref(false)
     const currentSessionUser = data.value?.user
+    const isPreviewMode = ref(false)
     const autoSaveEnabled = ref(true)
     const isEditing = ref(false)
+    const contentRef = ref<HTMLTextAreaElement>()
+    const dropZoneActive = ref(false)
     const postInput = ref({
         postId: route.params.post as string,
         title: '',
@@ -32,8 +40,13 @@
         tags: [] as string[],
         published: false
     })
+    const pendingImages = ref<PendingImages>({
+        files: [],
+        currentIndex: 0
+    })
     let currentUserFull: FullUser
     let autoSaveInterval: NodeJS.Timeout
+    let thumbnailVisible = ref(true)
     // If the user isn't even authenticated then they getting booted back to the normal post
     if (status.value != 'authenticated') {
         navigateTo(`/${route.params.blog}/${route.params.post}`)
@@ -97,18 +110,22 @@
         }
 
         currentUserFull = await $fetch<FullUser>('/api/user/getAllData')
+
+        // nextTick(() => {
+        //     setInitialHeight()
+        // })
     })
     // Watch the post inputs and enable save button if there's new input data and it's not saved
     watch([() => postInput.value], () => {
         if (!post.value) return
         
         hasChanges.value = 
-            postInput.value.title !== post.value.title ||
-            postInput.value.heroImg !== post.value.heroImg ||
-            postInput.value.summary !== post.value.summary ||
-            postInput.value.content !== post.value.content ||
-            JSON.stringify(postInput.value.tags) !== JSON.stringify(post.value.tags) ||
-            postInput.value.published !== post.value.published
+            postInput.value.title != post.value.title ||
+            postInput.value.heroImg != post.value.heroImg ||
+            postInput.value.summary != post.value.summary ||
+            postInput.value.content != post.value.content ||
+            JSON.stringify(postInput.value.tags) != JSON.stringify(post.value.tags) ||
+            postInput.value.published != post.value.published
     }, { deep: true })
     // Watch the autosave enabled input box and enable/disable it depending on its status
     watch(autoSaveEnabled, (newValue) => {
@@ -190,42 +207,6 @@
             showAltModal.value = true
         }
         reader.readAsDataURL(file)
-    }
-    // Changes DB
-    async function confirmImageUpload() {
-        if (!pendingImage.value || !pendingAlt.value || !pendingAlt.value.trim()) {
-            imageError.value = 'Alt text is required'
-            return
-        }
-
-        if (currentUserFull && currentUserFull.frozen) {
-            error.value = 'You can\'t do this. Your account is currently frozen.'
-            return
-        }
-
-        try {
-            const newImage = await $fetch('/api/blog/posts/images/create', {
-                method: 'POST',
-                body: {
-                    postId: post.value?.id,
-                    image: pendingImage.value.dataUrl,
-                    alt: pendingAlt.value
-                }
-            })
-            
-            images.value.push({
-                ...newImage,
-                createdAt: new Date(newImage.createdAt)
-            })
-
-            postInput.value.content += `\n[image:${newImage.id}:"${pendingAlt.value}"]\n`
-            
-            pendingImage.value = null
-            pendingAlt.value = ''
-            showAltModal.value = false
-        } catch (e: any) {
-            imageError.value = e.message
-        }
     }
 
     async function handleThumbnailUpload(event: Event) {
@@ -398,6 +379,162 @@
             loading.value = false
         }
     }
+
+    function handleGlobalDragOver(event: DragEvent) {
+        event.preventDefault()
+        event.stopPropagation()
+        dropZoneActive.value = true
+    }
+
+    function handleGlobalDragLeave(event: DragEvent) {
+        event.preventDefault() 
+        event.stopPropagation()
+        dropZoneActive.value = false
+    }
+
+    function handleGlobalDrop(event: DragEvent) {
+        event.preventDefault()
+        event.stopPropagation()
+        dropZoneActive.value = false
+        
+        const files = event.dataTransfer?.files
+        if (!files?.length) return
+
+        const imageFiles = Array.from(files).filter(file => {
+            const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+            return validTypes.includes(file.type)
+        })
+
+        if (imageFiles.length === 0) {
+            imageError.value = 'Please upload valid image files only'
+            return
+        }
+
+        pendingImages.value = {
+            files: imageFiles,
+            currentIndex: 0
+        }
+
+        showNextImagePrompt()
+    }
+
+    async function showNextImagePrompt() {
+        const currentFile = pendingImages.value.files[pendingImages.value.currentIndex]
+        
+        if (!currentFile) {
+            pendingImages.value = { files: [], currentIndex: 0 }
+            return
+        }
+
+        const reader = new FileReader()
+        reader.onload = (e) => {
+            pendingImage.value = {
+                file: currentFile,
+                dataUrl: e.target?.result as string
+            }
+            showAltModal.value = true
+        }
+        reader.readAsDataURL(currentFile)
+    }
+
+    async function confirmImageUpload() {
+        if (currentUserFull && currentUserFull.frozen) {
+            error.value = 'You can\'t do this. Your account is currently frozen.'
+            return
+        }
+
+        if (!pendingImage.value || !pendingAlt.value?.trim()) {
+            imageError.value = 'Alt text is required'
+            return
+        }
+
+        try {
+            const newImage = await $fetch('/api/blog/posts/images/create', {
+                method: 'POST',
+                body: {
+                    postId: post.value?.id,
+                    image: pendingImage.value.dataUrl,
+                    alt: pendingAlt.value
+                }
+            })
+
+            images.value.push({
+                ...newImage,
+                createdAt: new Date(newImage.createdAt)
+            })
+
+            // Insert at cursor position if textarea is focused
+            if (contentRef.value?.selectionStart !== undefined) {
+                const cursorPos = contentRef.value.selectionStart
+                const content = postInput.value.content
+                const imageMarker = `\n[image:${newImage.id}:"${pendingAlt.value}"]\n`
+                
+                postInput.value.content = content.slice(0, cursorPos) + imageMarker + content.slice(cursorPos)
+            } else {
+                postInput.value.content += `[image:${newImage.id}:"${pendingAlt.value}"]`
+            }
+
+            pendingImage.value = null
+            pendingAlt.value = ''
+            showAltModal.value = false
+
+            pendingImages.value.currentIndex++
+            if (pendingImages.value.currentIndex < pendingImages.value.files.length) {
+                showNextImagePrompt()
+            }
+        } catch (e: any) {
+            imageError.value = e.message
+        }
+    }
+
+    function handleTagInput(event: Event) {
+        const target = event.target as HTMLInputElement
+        const value = target.value
+
+        if (!value) return
+
+        if (value.includes(',')) {
+            const newTags = value.split(',').map(tag => tag.trim()).filter(tag => tag && !postInput.value.tags.includes(tag))
+            if (newTags.length > 0) {
+                postInput.value.tags = [...postInput.value.tags, ...newTags]
+            }
+            
+            target.value = ''
+        }
+    }
+
+    function removeTag(tag: string) {
+        postInput.value.tags = postInput.value.tags.filter(t => t !== tag)
+    }
+
+    function processContent() {
+        let content = postInput.value.content
+        
+        content = content.replace(/\[image:([^:]+):"([^"]+)"\]/g, (_, id, alt) => {
+            const img = images.value.find(i => i.id === id)
+            return img ? `![${alt}](${img.image})` : ''
+        })
+        
+        return marked(content, { 
+            breaks: true,
+            gfm: true
+        })
+    }
+
+    // function setInitialHeight() {
+    //     if (contentRef.value) {
+    //         const textarea = contentRef.value
+    //         textarea.style.height = 'auto'
+    //         textarea.style.height = `${textarea.scrollHeight}px`
+    //     }
+    // }
+
+    // function autoResize(event: Event) {
+    //     const textarea = event.target as HTMLTextAreaElement
+    //     textarea.style.height = 'auto'
+    //     textarea.style.height = `${textarea.scrollHeight}px`
+    // }
+
     // Cleans interval
     onUnmounted(() => {
         clearInterval(autoSaveInterval)
@@ -415,92 +552,120 @@
             </div>
 
             <form @submit.prevent="savePost" class="space-y-8">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Editor Section -->
-                    <div class="space-y-6">
-                        <div>
-                            <input 
-                                v-model="postInput.title" 
-                                type="text"
-                                placeholder="Post Title"
-                                class="w-full p-4 bg-secondary bg-opacity-5 border-0 rounded-lg text-xl font-semibold text-text placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20"
-                                maxlength="100"
-                            />
+                <div class="space-y-2">
+                    <!-- Hero Image Section -->
+                    <div class="space-y-2">
+                        <div class="flex gap-2">
+                            <p class="ml-4 text-sm text-secondary opacity-40">Post Thumbnail</p>
+                            <button 
+                                @click.prevent="thumbnailVisible = !thumbnailVisible" 
+                                class="rounded-full"
+                            >
+                                <svg v-if="thumbnailVisible" class="w-5 h-5 text-secondary hover:opacity-30 opacity-40 transition-all" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                <svg v-else class="w-5 h-5 text-secondary hover:opacity-30 opacity-40 transition-all" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                </svg>
+                            </button>
+                            <button v-if="postInput.heroImg" 
+                                @click.prevent="postInput.heroImg = ''" 
+                                class="rounded-full"
+                            >
+                                <svg class="w-5 h-5 text-secondary opacity-40 hover:text-red-400 transition-colors" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
                         </div>
-
-                        <div>
+                        <div class="relative" v-if="thumbnailVisible">
                             <input 
-                                v-model="postInput.summary"
-                                type="text"
-                                placeholder="Brief summary of your post"
-                                class="w-full p-4 bg-secondary bg-opacity-5 border-0 rounded-lg text-text placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20"
-                                maxlength="250"
+                                type="file" 
+                                accept="image/*"
+                                @change="handleThumbnailUpload"
+                                class="hidden"
+                                id="thumbnail"
                             />
-                        </div>
-
-                        <div>
-                            <input 
-                                type="text" 
-                                :value="postInput.tags.join(',')"
-                                @input="(e) => postInput.tags = (e.target as HTMLInputElement).value.split(',')"
-                                placeholder="Tags (comma-separated)"
-                                class="w-full p-4 bg-secondary bg-opacity-5 border-0 rounded-lg text-text placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20"
-                                maxlength="250"
-                            />
-                        </div>
-
-                        <!-- Hero Image Section -->
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-secondary opacity-70">Post Thumbnail</label>
-                            <div class="relative">
-                                <input 
-                                    type="file" 
-                                    accept="image/*"
-                                    @change="handleThumbnailUpload"
-                                    class="hidden"
-                                    id="thumbnail"
-                                />
-                                <label 
-                                    for="thumbnail"
-                                    class="flex items-center justify-center w-full h-40 border-2 border-dashed border-secondary border-opacity-25 rounded-lg hover:border-opacity-50 cursor-pointer transition-all"
+                            <label 
+                                for="thumbnail"
+                                class="flex items-center justify-center w-full h-[450px] border-2 border-dashed border-secondary border-opacity-25 rounded-lg hover:border-opacity-50 cursor-pointer transition-all"
+                            >
+                                <img 
+                                    v-if="postInput.heroImg" 
+                                    :src="postInput.heroImg" 
+                                    alt="Thumbnail"
+                                    class="w-full h-full object-cover rounded-lg"
                                 >
-                                    <img 
-                                        v-if="postInput.heroImg" 
-                                        :src="postInput.heroImg" 
-                                        alt="Thumbnail"
-                                        class="w-full h-full object-cover rounded-lg"
-                                    >
-                                    <div v-else class="text-center">
-                                        <svg class="mx-auto h-12 w-12 text-secondary opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                        <p class="mt-1 text-sm text-secondary opacity-40">Click to upload thumbnail</p>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Content Editor -->
-                        <div class="min-h-[400px]">
-                            <textarea 
-                                v-model="postInput.content" 
-                                rows="20"
-                                placeholder="Write your post content here using Markdown. Use the given image markers to place images."
-                                class="w-full p-4 bg-transparent border-0 text-text placeholder-secondary placeholder-opacity-25 focus:ring-0 focus:outline-none resize-none"
-                            ></textarea>
+                                <div v-else class="text-center">
+                                    <svg class="mx-auto h-12 w-12 text-secondary opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <p class="mt-1 text-sm text-secondary opacity-40">Click to upload thumbnail</p>
+                                </div>
+                            </label>
                         </div>
                     </div>
 
-                    <!-- Preview Section -->
-                    <div class="lg:border-l lg:border-secondary lg:border-opacity-10 lg:pl-8">
-                        <div class="sticky top-8">
-                            <h2 class="text-lg font-semibold text-text mb-4">Preview</h2>
-                            <div 
-                                class="prose prose-invert prose-sm sm:prose-base max-w-none"
-                                v-html="replaceImageMarkers(postInput.content || '')"
-                            ></div>
+                    <div>
+                        <input 
+                            v-model="postInput.title" 
+                            type="text"
+                            placeholder="Post Title"
+                            class="w-full mt-4 p-4 pt-6 bg-transparent bg-opacity-5 border-0 text-xl font-semibold text-text placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-0 border-t border-t-secondary border-opacity-10 focus:border-t-secondary focus:border-opacity-10"
+                            maxlength="100"
+                        />
+                    </div>
+
+                    <div>
+                        <input 
+                            v-model="postInput.summary"
+                            type="text"
+                            placeholder="Brief summary of your post"
+                            class="w-full p-4 bg-transparent bg-opacity-5 border-0 text-lg text-text placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-0 border-b-2 border-b-secondary border-opacity-0 focus:border-b-transparent focus:border-opacity-50"
+                            maxlength="250"
+                        />
+                    </div>
+
+                    <div>
+                        <div class="w-full p-4 pb-6 bg-transparent bg-opacity-5 border-0 text-lg text-text placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-0 border-b border-b-secondary border-opacity-10 focus:border-t-secondary focus:border-opacity-10 relative min-h-[50px] bg-secondary flex flex-wrap gap-2 items-center">
+                            <span v-for="tag in postInput.tags" :key="tag" 
+                                class="bg-secondary bg-opacity-5 text-text px-3 rounded flex items-center gap-2">
+                                {{ tag }}
+                                <button @click="removeTag(tag)" type="button" 
+                                    class="hover:text-red-400 transition-colors text-xs">
+                                    ✕
+                                </button>
+                            </span>
+                            <input
+                                type="text"
+                                @input="handleTagInput"
+                                class="flex-grow bg-transparent border-none placeholder-secondary placeholder-opacity-25 text-lg text-text focus:outline-none focus:border-none p-0 focus:ring-secondary focus:ring-opacity-0"
+                                placeholder="Type tags and press comma to add..."
+                                :disabled="loading"
+                            />
                         </div>
                     </div>
+
+                    <!-- Replace Content Editor section -->
+                    <div class="min-h-[400px]">
+                        <textarea 
+                            v-if="!isPreviewMode"
+                            v-model="postInput.content" 
+                            ref="contentRef"
+                            rows="25"
+                            placeholder="Write your post content here using Markdown. Use the given image markers to place images."
+                            @dragover="handleGlobalDragOver"
+                            @dragleave="handleGlobalDragLeave"
+                            @drop="handleGlobalDrop"
+                            class="w-full p-4 bg-transparent border-0 text-text placeholder-secondary placeholder-opacity-25 focus:ring-0 focus:outline-none resize-y min-h-[400px]"
+                        ></textarea>
+                        <div 
+                            v-else 
+                            class="prose prose-invert max-w-none p-4 rounded-lg"
+                            v-html="processContent()"
+                        ></div>
+                    </div>
+                    <p v-if="!isPreviewMode" class="ml-4 mt-1 text-sm text-secondary opacity-40">Attach images by dragging & dropping into the text area or use the controls below.</p>
                 </div>
 
                 <!-- Image Management -->
@@ -564,6 +729,22 @@
                 <div class="sticky bottom-0 bg-bg py-4 border-t border-secondary border-opacity-10">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-4">
+                            <button 
+                                v-if="isPreviewMode"
+                                @click="isPreviewMode = false"
+                                class="px-4 py-2 rounded-lg transition-all"
+                                :class="!isPreviewMode ? 'bg-primary text-white' : 'bg-secondary bg-opacity-10 text-text hover:bg-opacity-20'"
+                            >
+                                Edit
+                            </button>
+                            <button 
+                                v-if="!isPreviewMode"
+                                @click="isPreviewMode = true"
+                                class="px-4 py-2 rounded-lg transition-all"
+                                :class="isPreviewMode ? 'bg-primary text-white' : 'bg-secondary bg-opacity-10 text-text hover:bg-opacity-20'"
+                            >
+                                Preview
+                            </button>
                             <label class="flex items-center space-x-2 text-sm text-secondary opacity-70">
                                 <input 
                                     type="checkbox"
@@ -605,7 +786,7 @@
                 v-if="pendingImage && !isEditing" 
                 :src="pendingImage.dataUrl" 
                 alt="Preview" 
-                class="w-full h-48 object-cover rounded-lg mb-4"
+                class="w-full aspect-square object-cover rounded-lg mb-4"
             />
             <input 
                 v-model="pendingAlt"
@@ -632,3 +813,49 @@
         </div>
     </div>
 </template>
+
+<style scoped>
+    textarea {
+        scrollbar-width: thin;
+        scrollbar-color: #1e1f20;
+    }
+
+    textarea::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    textarea::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    textarea::-webkit-scrollbar-thumb {
+        background-color: #1e1f20;
+        border-radius: 4px;
+    }
+
+    textarea::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(var(--color-secondary), 0.3);
+    }
+
+    ::-webkit-scrollbar {
+        width: 12px; 
+        height: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #1e1f20; 
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #1e1f20; 
+        border-radius: 10px; 
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        border: 2px solid #1e1f20;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #1e1f20;
+    }
+
+</style>

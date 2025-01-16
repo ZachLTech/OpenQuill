@@ -181,84 +181,82 @@
             </div>
 
             <!-- Image Upload -->
-            <div>
-                <label class="flex items-center text-sm font-medium text-text mb-2">Blog Image
-                    <button v-if="formData.imageURL" 
-                        @click.prevent="formData.imageURL = ''" 
-                        class="p-1 rounded-full"
-                    >
-                        <svg class="w-4 h-4 text-text hover:text-red-400 transition-colors" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+            <label class="flex items-center text-sm font-medium text-text mb-2">Blog Image
+                <button v-if="formData.imageURL" 
+                    @click.prevent="formData.imageURL = ''" 
+                    class="p-1 rounded-full"
+                >
+                    <svg class="w-4 h-4 text-text hover:text-red-400 transition-colors" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </label>
+            <div class="flex items-center">
+                <input
+                    type="file"
+                    ref="dropZoneRef"
+                    accept="image/*"
+                    class="hidden" 
+                    id="blogImageInput"
+                    :disabled="loading"
+                    @change="handleFileUpload"
+                />
+                <label 
+                    for="blogImageInput" 
+                    class="flex justify-center items-center w-full h-[30vh] p-4 bg-secondary bg-opacity-5 border-2 border-dashed border-secondary border-opacity-25 rounded-lg text-center cursor-pointer hover:border-opacity-50 transition-all"
+                    @dragover="handleDragOver"
+                    @drop="handleDrop"
+                >   
+                    <div v-if="!formData.imageURL" class="h-full flex flex-col items-center justify-center">
+                        <svg class="w-16 h-16 mb-4 text-secondary opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                         </svg>
-                    </button>
-                </label>
-                <div class="flex items-center">
-                    <input
-                        type="file"
-                        ref="dropZoneRef"
-                        accept="image/*"
-                        class="hidden" 
-                        id="blogImageInput"
-                        :disabled="loading"
-                        @change="handleFileUpload"
+                        <span class="text-secondary text-lg opacity-50">Click to upload or drag and drop</span>
+                        <span class="text-md text-secondary opacity-40 mt-2">JPEG, PNG, WEBP or GIF (max. 15MB)</span>
+                    </div>
+                    <img 
+                        v-if="formData.imageURL" 
+                        :src="formData.imageURL" 
+                        alt="Preview" 
+                        class="h-full w-full object-contain rounded"
                     />
-                    <label 
-                        for="blogImageInput" 
-                        class="flex justify-center items-center w-full h-[30vh] p-4 bg-secondary bg-opacity-5 border-2 border-dashed border-secondary border-opacity-25 rounded-lg text-center cursor-pointer hover:border-opacity-50 transition-all"
-                        @dragover="handleDragOver"
-                        @drop="handleDrop"
-                    >   
-                        <div v-if="!formData.imageURL" class="h-full flex flex-col items-center justify-center">
-                            <svg class="w-16 h-16 mb-4 text-secondary opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                            </svg>
-                            <span class="text-secondary text-lg opacity-50">Click to upload or drag and drop</span>
-                            <span class="text-md text-secondary opacity-40 mt-2">JPEG, PNG, WEBP or GIF (max. 15MB)</span>
-                        </div>
-                        <img 
-                            v-if="formData.imageURL" 
-                            :src="formData.imageURL" 
-                            alt="Preview" 
-                            class="h-full w-full object-contain rounded"
-                        />
-                    </label>
-                </div>
+                </label>
             </div>
 
             <!-- Tags -->
-            <div>
-                <label class="block text-sm font-medium text-text mb-2">
-                    Tags
-                </label>
-                <div class="flex flex-wrap gap-2 mb-2">
-                    <span
-                        v-for="tag in formData.tags"
-                        :key="tag"
-                        class="px-3 py-1 text-sm bg-secondary bg-opacity-10 rounded-lg text-text flex items-center"
+            
+            <label class="block text-sm font-medium text-text mb-2">
+                Tags
+            </label>
+            <div class="flex flex-wrap gap-2 mb-2">
+                <span
+                    v-for="tag in formData.tags"
+                    :key="tag"
+                    class="px-3 py-1 text-sm bg-secondary bg-opacity-10 rounded-lg text-text flex items-center"
+                >
+                    {{ tag }}
+                    <button
+                        @click.prevent="removeTag(tag)"
+                        class="ml-2 text-text text-opacity-25 hover:text-red-500 transition-colors"
                     >
-                        {{ tag }}
-                        <button
-                            @click.prevent="removeTag(tag)"
-                            class="ml-2 text-text text-opacity-25 hover:text-red-500 transition-colors"
-                        >
-                            ×
-                        </button>
-                    </span>
-                </div>
-                <div class="flex gap-2">
-                    <div class="relative w-full min-h-[20px] p-1 bg-secondary bg-opacity-10 rounded-lg flex flex-wrap gap-2 items-center">
-                        <input
-                            ref="tagInput"
-                            @input="handleTagInput"
-                            @keydown="handleTagKeydown"
-                            type="text"
-                            class="flex-grow bg-transparent border-none focus:outline-none text-text p-2 focus:ring-secondary focus:ring-opacity-20 rounded"
-                            placeholder="Type tags and press comma to add..."
-                            :disabled="loading"
-                        />
-                    </div>
+                        ×
+                    </button>
+                </span>
+            </div>
+            <div class="flex gap-2">
+                <div class="relative w-full min-h-[20px] p-1 bg-secondary bg-opacity-10 rounded-lg flex flex-wrap gap-2 items-center">
+                    <input
+                        ref="tagInput"
+                        @input="handleTagInput"
+                        @keydown="handleTagKeydown"
+                        type="text"
+                        class="flex-grow bg-transparent border-none focus:outline-none text-text p-2 focus:ring-secondary focus:ring-opacity-20 rounded"
+                        placeholder="Type tags and press comma to add..."
+                        :disabled="loading"
+                    />
                 </div>
             </div>
+            
 
             <!-- Error Message -->
             <div v-if="error" class="text-red-400 text-sm">
