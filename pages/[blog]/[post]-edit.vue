@@ -1,4 +1,6 @@
 <script setup lang="ts">
+    import { useDropZone } from '@vueuse/core'
+
     // Types
     import { marked } from 'marked'
     import type { Post, Image, User as FullUser } from '@prisma/client'
@@ -31,6 +33,14 @@
     const isEditing = ref(false)
     const contentRef = ref<HTMLTextAreaElement>()
     const dropZoneActive = ref(false)
+    const thumbnailDropRef = ref<HTMLDivElement>()
+    const thumbnailDragActive = ref(false)
+
+    const { isOverDropZone: isThumbnailDropping } = useDropZone(thumbnailDropRef, {
+        onDrop: (files) => handleThumbnailUpload(null, files),
+        onEnter: () => thumbnailDragActive.value = true,
+        onLeave: () => thumbnailDragActive.value = false,
+    })
     const postInput = ref({
         postId: route.params.post as string,
         title: '',
@@ -168,19 +178,6 @@
         return '';
     }
 
-    function replaceImageMarkers(content: string): string {
-        const markerRegex = /\[image:([^:]+):"([^"]+)"\]/g;
-        const markdownContent = content.replace(markerRegex, (match, imageId, alt) => {
-            const image = images.value.find(img => img.id === imageId);
-            if (image) {
-                return `<img src="${image.image}" alt="${alt}" class="my-4">`;
-            }
-            return '';
-        });
-        
-        return markdownContent;
-    }
-
     async function handleImageUpload(event: Event) {
         const input = event.target as HTMLInputElement
         const file = input.files?.[0]
@@ -209,9 +206,15 @@
         reader.readAsDataURL(file)
     }
 
-    async function handleThumbnailUpload(event: Event) {
-        const input = event.target as HTMLInputElement
-        const file = input.files?.[0]
+    async function handleThumbnailUpload(event: Event | null, droppedFiles?: File[] | null) {
+        let file: File | undefined
+
+        if (event) {
+            const input = event.target as HTMLInputElement
+            file = input.files?.[0]
+        } else if (droppedFiles?.length) {
+            file = droppedFiles[0]
+        }
         
         if (!file) return
         
@@ -231,40 +234,6 @@
             postInput.value.heroImg = e.target?.result as string
         }
         reader.readAsDataURL(file)
-    }
-    // Changes DB
-    async function updateAltText(imageId: string, newAlt: string | null) {
-        try {
-
-            if (currentUserFull && currentUserFull.frozen) {
-                error.value = 'You can\'t do this. Your account is currently frozen.'
-                return
-            }
-            
-            await $fetch('/api/blog/posts/images/update', {
-                method: 'POST',
-                body: {
-                    imageId,
-                    alt: newAlt
-                }
-            })
-
-            const imageToUpdate = images.value.find(img => img.id === imageId)
-            if (imageToUpdate) {
-                imageToUpdate.alt = newAlt
-            }
-
-            const markerRegex = new RegExp(`\\[image:${imageId}:"[^"]*"\\]`, 'g')
-            postInput.value.content = postInput.value.content.replace(
-                markerRegex,
-                `[image:${imageId}:"${newAlt}"]`
-            )
-
-            editingImageId.value = null
-            newAltText.value = ''
-        } catch (e: any) {
-            error.value = e.message
-        }
     }
     // Changes DB
     async function deleteImage(imageId: string, imageAlt: string | null) {
@@ -521,20 +490,6 @@
         })
     }
 
-    // function setInitialHeight() {
-    //     if (contentRef.value) {
-    //         const textarea = contentRef.value
-    //         textarea.style.height = 'auto'
-    //         textarea.style.height = `${textarea.scrollHeight}px`
-    //     }
-    // }
-
-    // function autoResize(event: Event) {
-    //     const textarea = event.target as HTMLTextAreaElement
-    //     textarea.style.height = 'auto'
-    //     textarea.style.height = `${textarea.scrollHeight}px`
-    // }
-
     // Cleans interval
     onUnmounted(() => {
         clearInterval(autoSaveInterval)
@@ -578,7 +533,7 @@
                                 </svg>
                             </button>
                         </div>
-                        <div class="relative" v-if="thumbnailVisible">
+                        <div class="relative" ref="thumbnailDropRef" v-if="thumbnailVisible">
                             <input 
                                 type="file" 
                                 accept="image/*"
@@ -596,11 +551,12 @@
                                     alt="Thumbnail"
                                     class="w-full h-full object-cover rounded-lg"
                                 >
-                                <div v-else class="text-center">
-                                    <svg class="mx-auto h-12 w-12 text-secondary opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div v-else class="text-center flex flex-col">
+                                    <svg class="mx-auto h-16 w-16 text-secondary opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
-                                    <p class="mt-1 text-sm text-secondary opacity-40">Click to upload thumbnail</p>
+                                    <span class="text-secondary text-lg opacity-50">Click to upload or drag and drop</span>
+                                    <span class="text-md text-secondary opacity-40">JPEG, PNG, WEBP or GIF (max. 15MB)</span>
                                 </div>
                             </label>
                         </div>
