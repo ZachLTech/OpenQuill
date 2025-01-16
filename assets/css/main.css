@@ -5,3 +5,14 @@
 body {
     @apply bg-[#1e1f20]
 }
+
+.prose {
+    --tw-text-opacity: 1;
+    color: rgb(235 239 244 / var(--tw-text-opacity, 1));
+}
+
+.prose img {
+    border-radius: 0.5rem;
+    max-height: 400px;
+    width: auto;
+}
