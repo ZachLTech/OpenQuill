@@ -23,7 +23,6 @@ Things to implement eventually:
 
 
 TODO: 
-- Add basic SEO (maybe variable SEO based on like post and such that'd be cool)
 - Try building (until successful)
 - Add docker-compose and dockerfile(s) for both webapp and postgres database
 - Make default .env considering postgresdb

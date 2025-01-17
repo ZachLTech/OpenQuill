@@ -22,3 +22,5 @@ logs
 .env
 .env.production
 !.env.example
+
+postgres_data
