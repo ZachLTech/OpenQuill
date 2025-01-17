@@ -46,7 +46,7 @@
 </script>
 
 <template>
-    <nav class="w-full bg-gray-700 bg-opacity-15 py-4 px-6 mb-2">
+    <nav class="w-full py-4 px-6 mb-16 fixed top-0 left-0 right-0 z-50 bg-bg">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
             <NuxtLink 
                 to="/" 
@@ -72,7 +72,7 @@
                     </NuxtLink>
                     <button 
                         @click="signOut()" 
-                        class="px-4 py-2 text-text bg-gray-700 bg-opacity-25 rounded-lg hover:bg-opacity-40 transition-all"
+                        class="px-4 py-2 text-text bg-secondary bg-opacity-25 rounded-lg hover:bg-opacity-40 transition-all"
                     >
                         Sign Out
                     </button>

@@ -25,7 +25,6 @@
     const pendingImage = ref<{file: File, dataUrl: string} | null>(null)
     const pendingAlt = ref<string | null>('')
     const editingImageId = ref<string | null>(null)
-    const newAltText = ref<string | null>('')
     const hasChanges = ref(false)
     const currentSessionUser = data.value?.user
     const isPreviewMode = ref(false)
@@ -63,6 +62,7 @@
     }
     // Runs this as soon as the page is mounted - sets up autosave if a enabled, gets post data, makes sure the user is allowed to be there, and gets user
     onMounted(async () => {
+        loading.value = true
         // Get and enable or disable autosave setting
         const savedPreference = localStorage.getItem('autoSaveEnabled')
         if (savedPreference !== null) {
@@ -120,6 +120,7 @@
         }
 
         currentUserFull = await $fetch<FullUser>('/api/user/getAllData')
+        loading.value = false
 
         // nextTick(() => {
         //     setInitialHeight()
@@ -498,14 +499,17 @@
 
 <template>
     <appNav />
-    
-    <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-5xl mx-auto">
-            <!-- Error Display -->
-            <div v-if="error" class="mb-6 p-4 rounded-lg bg-red-500 bg-opacity-20">
-                <p class="text-sm text-red-400">{{ error }}</p>
-            </div>
 
+    <div v-if="loading" class="flex justify-center items-center min-h-[400px]">
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-800 border-t-primary"></div>
+    </div>
+
+    <div v-if="error" class="mb-6 p-4 rounded-lg bg-red-500 bg-opacity-20">
+        <p class="text-sm text-red-400">{{ error }}</p>
+    </div>
+    
+    <div v-else-if="post" class="min-h-screen py-8 px-4 sm:px-6 lg:px-8 mt-16">
+        <div class="max-w-6xl mx-auto">
             <form @submit.prevent="savePost" class="space-y-8">
                 <div class="space-y-2">
                     <!-- Hero Image Section -->
@@ -543,7 +547,7 @@
                             />
                             <label 
                                 for="thumbnail"
-                                class="flex items-center justify-center w-full h-[450px] border-2 border-dashed border-secondary border-opacity-25 rounded-lg hover:border-opacity-50 cursor-pointer transition-all"
+                                class="flex items-center justify-center w-full h-[400px] border-2 border-dashed border-secondary border-opacity-25 rounded-lg hover:border-opacity-50 cursor-pointer transition-all"
                             >
                                 <img 
                                     v-if="postInput.heroImg" 
@@ -717,6 +721,13 @@
                                 />
                                 <span>Publish Post</span>
                             </label>
+                            <<NuxtLink 
+                                :to="`/${route.params.blog}/${route.params.post}`" 
+                                v-if="post.published"
+                                class="px-4 py-2 bg-primary text-text rounded-lg hover:bg-opacity-90 transition-all disabled:bg-opacity-50 disabled:cursor-not-allowed"
+                            >
+                                View Post Page
+                            </NuxtLink>
                         </div>
                         
                         <button 

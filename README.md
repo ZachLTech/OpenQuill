@@ -16,7 +16,4 @@ Things to implement eventually:
 - make the blog URL slug customizable as opposed to it just being the blog title (optimizing potentially bloated URLs)
 - modularize page code a lot more with things such as pages component, posts component, etc.
 - Add newsletter list capability (whoever hosts it can add an SMTP server and it'll send emails to recipients who subscribe to updates from blog)
-
-TODO: 
-- 
-
+- Add code highlighting in post content

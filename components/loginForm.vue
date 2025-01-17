@@ -36,7 +36,7 @@
 </script>
 
 <template>
-    <form @submit.prevent="handleLogin" class="w-full max-w-md mx-auto bg-gray-700 bg-opacity-15 p-8 rounded-lg shadow-lg">
+    <form @submit.prevent="handleLogin" class="w-full max-w-md mx-auto bg-secondary bg-opacity-5 p-8 rounded-lg shadow-lg">
         <h2 class="text-3xl font-extrabold text-text text-center mb-6">Welcome Back</h2>
         
         <p class="text-center text-secondary opacity-70 mb-8">
@@ -58,7 +58,7 @@
                     placeholder="Email" 
                     required 
                     :disabled="loading"
-                    class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20text-textdisabled:bg-opacity-10 disabled:cursor-not-allowedtransition-all"
+                    class="w-full p-4 bg-secondary bg-opacity-5 border-0 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20text-textdisabled:bg-opacity-10 disabled:cursor-not-allowedtransition-all"
                 />
             </div>
 
@@ -69,7 +69,7 @@
                     placeholder="Password" 
                     required 
                     :disabled="loading"
-                    class="w-full p-4 bg-gray-700 bg-opacity-15 border-0 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20text-textdisabled:bg-opacity-10 disabled:cursor-not-allowedtransition-all"
+                    class="w-full p-4 bg-secondary bg-opacity-5 border-0 rounded-lg placeholder-secondary placeholder-opacity-25 focus:ring-secondary focus:ring-opacity-20text-textdisabled:bg-opacity-10 disabled:cursor-not-allowedtransition-all"
                 />
             </div>
 

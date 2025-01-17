@@ -268,7 +268,7 @@
                 </div>    
                 <footer class="w-full mt-8 pt-4 border-t border-text border-opacity-25 flex justify-center">
                     <div class="mt-2">
-                        <p class="text-text text-sm sm:text-[16px] text-opacity-20">Powered by <a href="https://github.com/ZachLTech/blogz" class="underline" target="_blank">OpenQuill</a> - Open Source Blogging Platform</p>
+                        <p class="text-text text-sm sm:text-[16px] text-opacity-20">Powered by <a href="https://github.com/ZachLTech/OpenQuill" class="underline" target="_blank">OpenQuill</a> - Open Source Blogging Platform</p>
                     </div>
                 </footer>
             </div>
