@@ -121,6 +121,15 @@ onMounted(async () => {
 	}
 
 	currentUserFull = await $fetch<FullUser>("/api/user/getAllData");
+
+	useSeoMeta({
+		title: `Editing ${post.value?.title}` || 'Editing Blog Post',
+		ogTitle: `Editing ${post.value?.title}` || 'Editing Blog Post',
+		description: `Edit the ${post.value?.title} Post`,
+		ogDescription: `Edit the ${post.value?.title} Post`,
+		ogImage: `${post.value?.heroImg}`,
+		twitterCard: 'summary_large_image',
+	})
 	loading.value = false;
 
 	// nextTick(() => {

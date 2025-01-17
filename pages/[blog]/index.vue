@@ -29,6 +29,7 @@ const route = useRoute();
 const { data, status } = useAuth();
 const currentSessionUser = ref<User | undefined>(data.value?.user as User);
 const postsPerPage = 6;
+const platformTitle = useRuntimeConfig().public.platformTitle;
 let showDeleteModal = ref(false);
 let postToDelete = ref<any | null>(null);
 let loading = ref(true);
@@ -123,6 +124,15 @@ onMounted(async () => {
 			);
 
 			unpublishedPosts.value = unpublishedPostsData;
+
+			useSeoMeta({
+				title: `${route.params.blog}` || 'Blog',
+				ogTitle: `${route.params.blog}` || 'Blog',
+				description: `View the ${route.params.blog} Blog and Posts`,
+				ogDescription: `View the ${route.params.blog} Blog and Posts`,
+				ogImage: `${blog.value?.imageURL}`,
+				twitterCard: 'summary_large_image',
+			})
 		}
 	} catch (e: any) {
 		error.value = "Error loading blog";

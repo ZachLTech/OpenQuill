@@ -37,6 +37,7 @@ type Blog = {
 };
 // All initial logic declarations
 const autoRedirectSingleBlog = useRuntimeConfig().public.firstBlogAutoRedirect;
+const platformTitle = useRuntimeConfig().public.platformTitle;
 const loading = ref(true);
 const postsLoading = ref(false);
 const instanceInitialized = ref(false);
@@ -46,6 +47,7 @@ const pageSize = ref(6);
 const recentPosts = ref<RecentPost[] | null>([]);
 let blogs = ref<Blog[]>();
 let totalPages: number;
+
 // Runs this as soon as the page is mounted - gets all blogs and navigates to single blog if there's only one and .env option is enabled to do so and recent posts
 onMounted(async () => {
 	try {
@@ -67,7 +69,14 @@ onMounted(async () => {
 			return;
 		}
 
-		fetchRecentPosts();
+		await fetchRecentPosts();
+
+		useSeoMeta({
+			title: `${platformTitle} - Home` || 'OpenQuill - Home',
+			ogTitle: `${platformTitle} - Home` || 'OpenQuill - Home',
+			description: `An open source blogging platform`,
+			ogDescription: `An open source blogging platform`,
+		})
 	} catch (e: any) {
 		error.value = "There was an error getting the blogs.";
 		console.error("Blog loading error:", e);

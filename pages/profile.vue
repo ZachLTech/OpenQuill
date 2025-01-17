@@ -35,6 +35,8 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
 	multiple: false,
 	preventDefaultForUnhandled: false,
 });
+const platformTitle = useRuntimeConfig().public.platformTitle;
+
 // If the user isn't even authenticated then they getting booted back to login
 if (status.value === "unauthenticated") {
 	navigateTo("/login");
@@ -60,6 +62,14 @@ onMounted(async () => {
 			updatedAt: new Date(userData.updatedAt),
 		};
 	}
+
+	
+	useSeoMeta({
+		title: `${platformTitle} - Your Profile` || 'OpenQuill - Profile',
+		ogTitle: `${platformTitle} - Your Profile` || 'OpenQuill - Profile',
+		description: `Profile to ${platformTitle}`,
+		ogDescription: `Profile to ${platformTitle}`,
+	})
 
 	loading.value = false;
 });

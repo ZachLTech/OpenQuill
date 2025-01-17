@@ -42,6 +42,14 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
 });
 
 let step = ref(1);
+const platformTitle = useRuntimeConfig().public.platformTitle;
+
+useSeoMeta({
+  title: `${route.params.blog} - Setup` || 'Blog Setup',
+  ogTitle: `${route.params.blog} - Setup` || 'Blog Setup',
+  description: `Setup your blog ${platformTitle}`,
+  ogDescription: `Setup your blog ${platformTitle}`,
+})
 // If the user isn't even authenticated then they getting booted straight back to login
 if (status.value === "unauthenticated") {
 	navigateTo("/login");

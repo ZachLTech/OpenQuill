@@ -72,6 +72,15 @@ onMounted(async () => {
 		}
 
 		fetchRelatedPosts();
+
+		useSeoMeta({
+			title: `${post.value?.title}` || 'Blog Post',
+			ogTitle: `${post.value?.title}` || 'Blog Post',
+			description: `View the ${post.value?.title} Post`,
+			ogDescription: `View the ${post.value?.title} Post`,
+			ogImage: `${post.value?.heroImg}`,
+			twitterCard: 'summary_large_image',
+		})
 	} catch (e: any) {
 		error.value = "Error loading post";
 		console.error("Post loading error:", e);
