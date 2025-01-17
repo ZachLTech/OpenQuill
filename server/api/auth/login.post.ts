@@ -1,31 +1,31 @@
-import { compare } from 'bcrypt'
+import { compare } from "bcrypt";
 
 export default eventHandler(async (event) => {
-    const body = await readBody(event)
+	const body = await readBody(event);
 
-    const user = await event.context.prisma.user.findUnique({
-        where: { email: body.email }
-    })
+	const user = await event.context.prisma.user.findUnique({
+		where: { email: body.email },
+	});
 
-    if (!user || !user.password) {
-        throw createError({
-            statusCode: 401,
-            statusMessage: 'Invalid credentials'
-        })
-    }
+	if (!user || !user.password) {
+		throw createError({
+			statusCode: 401,
+			statusMessage: "Invalid credentials",
+		});
+	}
 
-    const isValid = await compare(body.password, user.password)
+	const isValid = await compare(body.password, user.password);
 
-    if (!isValid) {
-        throw createError({
-            statusCode: 401,
-            statusMessage: 'Invalid credentials'
-        })
-    }
+	if (!isValid) {
+		throw createError({
+			statusCode: 401,
+			statusMessage: "Invalid credentials",
+		});
+	}
 
-    return { 
-        id: user.id,
-        email: user.email,
-        name: user.name
-    }
-})
+	return {
+		id: user.id,
+		email: user.email,
+		name: user.name,
+	};
+});

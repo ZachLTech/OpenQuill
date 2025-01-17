@@ -1,12 +1,16 @@
 <script setup lang="ts">
-    const { status } = useAuth()
+// All initial logic declarations
+const { status } = useAuth();
 
-    if (status.value === 'authenticated') {
-        navigateTo('/');
-    }
+if (status.value === "authenticated") {
+	navigateTo("/");
+}
 </script>
 
 <template>
-    <appNav />
-    <signupForm class="mt-[15vh]" />
+	<appNav />
+
+	<div class="px-4 sm:mx-0">
+		<signupForm class="mt-[15vh]" />
+	</div>
 </template>
