@@ -2,6 +2,7 @@
 // All initial logic declarations
 const { status } = useAuth();
 const platformTitle = useRuntimeConfig().public.platformTitle;
+let allowSignups = (useRuntimeConfig().allowSignups as string)
 
 useSeoMeta({
   title: `${platformTitle} - Login` || 'OpenQuill - Login',
@@ -12,6 +13,8 @@ useSeoMeta({
 
 if (status.value === "authenticated") {
 	navigateTo("/");
+} else if (allowSignups != 'true') {
+	navigateTo("/login")
 }
 </script>
 

@@ -3,12 +3,20 @@ import { hash } from "bcrypt";
 export default defineEventHandler(async (event) => {
 	try {
 		const body = await readBody(event);
+		let allowSignups = useRuntimeConfig().allowSignups as string | null
 		let admin = false;
+
+		if (allowSignups && allowSignups.toLowerCase() != 'true') {
+			throw createError({
+				statusCode: 403,
+				message: "Signups are currently disabled",
+			});
+		}
 
 		if (!body.email || !body.password) {
 			throw createError({
-				statusCode: 400,
-				message: "Email and password are required",
+			statusCode: 400,
+			message: "Email and password are required",
 			});
 		}
 

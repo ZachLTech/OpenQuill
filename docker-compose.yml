@@ -1,7 +1,5 @@
-version: '3.8'
-
 services:
-  webapp:
+  openquill:
     build: .
     ports:
       - "${PORT}:3000"
@@ -11,7 +9,8 @@ services:
       db:
         condition: service_healthy
     networks:
-      - app-network
+      - openquill-network
+    restart: unless-stopped
 
   db:
     image: postgres:15
@@ -24,16 +23,17 @@ services:
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
     networks:
-      - app-network
+      - openquill-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
 volumes:
   postgres_data:
 
 networks:
-  app-network:
+  openquill-network:
     driver: bridge

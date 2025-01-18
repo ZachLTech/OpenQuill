@@ -27,6 +27,7 @@ const props = defineProps<{
 	user?: fullUser;
 }>();
 const isActive = computed(() => (path: string) => route.path === path);
+let allowSignups = ref((useRuntimeConfig().allowSignups as string))
 let userBlogPath = ref(
 	(() => {
 		if (props.user?.blog.title) {
@@ -97,6 +98,7 @@ onMounted(async () => {
 						Home
 					</NuxtLink>
 					<NuxtLink
+						v-if="allowSignups == 'true'"
 						to="/signup"
 						:class="`text-${
 							isActive('/signup') ? 'primary' : 'text'
