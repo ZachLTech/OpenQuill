@@ -3,10 +3,10 @@ import { hash } from "bcrypt";
 export default defineEventHandler(async (event) => {
 	try {
 		const body = await readBody(event);
-		let allowSignups = useRuntimeConfig().allowSignups as string | null
+		let allowSignups = useRuntimeConfig().public.allowSignups
 		let admin = false;
 
-		if (allowSignups && allowSignups.toLowerCase() != 'true') {
+		if (allowSignups != 'true') {
 			throw createError({
 				statusCode: 403,
 				message: "Signups are currently disabled",

@@ -13,8 +13,8 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     authSecret: process.env.AUTH_SECRET,
-    allowSignups: process.env.ALLOW_SIGNUPS,
     public: {
+      allowSignups: process.env.ALLOW_SIGNUPS,
       baseURL: process.env.BASE_URL || `http://localhost:${process.env.PORT}`,
       firstBlogAutoRedirect: process.env.ENABLE_SINGLE_BLOG_AUTO_REDIRECT,
       platformTitle: process.env.PLATFORM_TITLE

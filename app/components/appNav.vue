@@ -27,7 +27,7 @@ const props = defineProps<{
 	user?: fullUser;
 }>();
 const isActive = computed(() => (path: string) => route.path === path);
-let allowSignups = ref((useRuntimeConfig().allowSignups as string))
+let allowSignups = ref(useRuntimeConfig().public.allowSignups)
 let userBlogPath = ref(
 	(() => {
 		if (props.user?.blog.title) {
