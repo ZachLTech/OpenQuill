@@ -354,7 +354,7 @@ async function fetchPublishedPosts() {
 	</div>
 
 	<div
-		v-else-if="blog"
+		v-else-if="!loading && blog"
 		class="min-h-screen py-8 mt-16 sm:pt-10 px-4 sm:px-6 lg:px-8"
 	>
 		<confirmModal

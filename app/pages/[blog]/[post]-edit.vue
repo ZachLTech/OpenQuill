@@ -568,7 +568,7 @@ onUnmounted(() => {
 		></div>
 	</div>
 
-	<div v-else-if="post" class="min-h-screen py-8 px-4 sm:px-6 lg:px-8 mt-16">
+	<div v-else-if="!loading && post" class="min-h-screen py-8 px-4 sm:px-6 lg:px-8 mt-16">
 		<div class="max-w-6xl mx-auto">
 			<form @submit.prevent="savePost" class="space-y-8">
 				<div class="space-y-2">
