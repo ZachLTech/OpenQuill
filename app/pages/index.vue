@@ -128,7 +128,7 @@ async function fetchRecentPosts() {
 		<div class="max-w-3xl sm:max-w-7xl mx-auto">
 			<div
 				v-if="loading"
-				class="flex justify-center items-center absolute min-h-[400px]"
+				class="flex justify-center items-center min-h-[400px]"
 			>
 				<div
 					class="animate-spin rounded-full h-12 w-12 border-4 border-gray-800 border-t-primary"

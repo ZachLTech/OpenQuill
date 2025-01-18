@@ -347,7 +347,7 @@ async function fetchPublishedPosts() {
 		</div>
 	</div>
 
-	<div v-if="loading" class="flex justify-center items-center absolute min-h-[400px]">
+	<div v-if="loading" class="flex justify-center items-center min-h-[400px]">
 		<div
 			class="animate-spin rounded-full h-12 w-12 border-4 border-gray-800 border-t-primary"
 		></div>
