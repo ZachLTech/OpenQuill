@@ -539,12 +539,6 @@ onUnmounted(() => {
 <template>
 	<appNav />
 
-	<div v-if="loading" class="flex justify-center items-center min-h-[400px]">
-		<div
-			class="animate-spin rounded-full h-12 w-12 border-4 border-gray-800 border-t-primary"
-		></div>
-	</div>
-
 	<div v-if="error" class="p-4 w-full flex justify-center absolute z-10 top-15">
 		<div
 			class="w-full max-w-6xl p-4 rounded-lg bg-red-900 flex"
@@ -568,7 +562,13 @@ onUnmounted(() => {
 		</div>
 	</div>
 
-	<div v-if="post" class="min-h-screen py-8 px-4 sm:px-6 lg:px-8 mt-16">
+	<div v-if="loading" class="flex justify-center items-center min-h-[400px]">
+		<div
+			class="animate-spin rounded-full h-12 w-12 border-4 border-gray-800 border-t-primary"
+		></div>
+	</div>
+
+	<div v-else-if="post" class="min-h-screen py-8 px-4 sm:px-6 lg:px-8 mt-16">
 		<div class="max-w-6xl mx-auto">
 			<form @submit.prevent="savePost" class="space-y-8">
 				<div class="space-y-2">

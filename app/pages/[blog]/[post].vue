@@ -148,7 +148,7 @@ async function fetchRelatedPosts() {
 <template>
 	<appNav class="fixed top-0 left-0 right-0 z-50 bg-bg" />
 
-	<div v-if="loading" class="flex justify-center items-center min-h-[400px]">
+	<div v-if="loading" class="flex justify-center absolute items-center min-h-[400px]">
 		<div
 			class="animate-spin rounded-full h-12 w-12 border-4 border-gray-800 border-t-primary"
 		></div>

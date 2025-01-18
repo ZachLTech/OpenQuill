@@ -324,12 +324,6 @@ async function fetchPublishedPosts() {
 <template>
 	<appNav />
 
-	<div v-if="loading" class="flex justify-center items-center min-h-[400px]">
-		<div
-			class="animate-spin rounded-full h-12 w-12 border-4 border-gray-800 border-t-primary"
-		></div>
-	</div>
-
 	<div v-if="error" class="p-4 w-full flex justify-center z-10 absolute top-15">
 		<div
 			class="w-full max-w-6xl p-4 rounded-lg bg-red-900 flex"
@@ -353,8 +347,14 @@ async function fetchPublishedPosts() {
 		</div>
 	</div>
 
+	<div v-if="loading" class="flex justify-center items-center absolute min-h-[400px]">
+		<div
+			class="animate-spin rounded-full h-12 w-12 border-4 border-gray-800 border-t-primary"
+		></div>
+	</div>
+
 	<div
-		v-if="blog"
+		v-else-if="blog"
 		class="min-h-screen py-8 mt-16 sm:pt-10 px-4 sm:px-6 lg:px-8"
 	>
 		<confirmModal
