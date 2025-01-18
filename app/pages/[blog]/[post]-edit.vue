@@ -34,6 +34,7 @@ const contentRef = ref<HTMLTextAreaElement>();
 const dropZoneActive = ref(false);
 const thumbnailDropRef = ref<HTMLDivElement>();
 const thumbnailDragActive = ref(false);
+const saving = ref(false)
 
 const { isOverDropZone: isThumbnailDropping } = useDropZone(thumbnailDropRef, {
 	onDrop: (files) => handleThumbnailUpload(null, files),
@@ -297,7 +298,7 @@ function validateInput(postInput: any): string {
 // Changes DB
 async function savePost() {
 	try {
-		loading.value = true;
+		saving.value = true;
 		error.value = "";
 
 		if (currentUserFull && currentUserFull.frozen) {
@@ -335,7 +336,7 @@ async function savePost() {
 	} catch (e: any) {
 		error.value = e.message;
 	} finally {
-		loading.value = false;
+		saving.value = false;
 	}
 }
 
@@ -941,11 +942,11 @@ onUnmounted(() => {
 							</div>
 							<button
 								type="submit"
-								:disabled="loading || !hasChanges"
+								:disabled="saving || !hasChanges"
 								class="px-6 py-2 bg-primary text-text rounded-lg hover:bg-opacity-90 transition-all disabled:bg-opacity-50 disabled:cursor-not-allowed"
 							>
 								{{
-									loading
+									saving
 										? "Saving..."
 										: hasChanges
 										? "Save Changes"
