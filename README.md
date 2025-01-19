@@ -18,8 +18,8 @@ OpenQuill is a modern, self-hosted blogging platform built for developers and wr
 ## 📑 Table of Contents
 - [Features](#features)
 - [Demo](#demo)
-- [Gallery](#gallery)
-- [Getting Started](#getting-started)
+  - [Gallery](#gallery)
+- [Getting Started](#installation--hosting)
   - [Prerequisites](#prerequisites)
   - [Hosting With Docker](#hosting-with-docker)
     - [Updating Docker Instance](#updating-docker-instance)
