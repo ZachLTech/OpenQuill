@@ -1,4 +1,6 @@
-<img src="./OpenQuillLogo.png" />
+<p align="center"> 
+  <img width="500" src="./OpenQuillLogo.png" /> 
+</p>
 
 # OpenQuill
 
@@ -17,7 +19,16 @@ OpenQuill is a modern, self-hosted blogging platform built for developers and wr
 - **Auto-Save**: Never lose your work with automatic draft saving
 - **More to come...**
 
-## 📦 Installation & Hosting
+## [Demo](https://openquill.zachl.tech)
+There is a demo instance running at [openquill.zachl.tech](https://openquill.zachl.tech) and you may login to the Demo user to view the editor and test everything out with these login credentials:
+
+`Email`: demo@demo.demo
+
+`Password`: Testing123!
+
+You can also view a walkthrough on setting up OpenQuill which includes a tour [here]()
+
+## Installation & Hosting
 
 ### Using Docker (Recommended for Hosting)
 
