@@ -24,7 +24,73 @@ Things to implement eventually:
 - copy paste support for images in post editor
 
 
-TODO: 
-- Test everything in new container
-- Make Demo instance with silly users and blogs and posts and such
-- Make demo instance have frozen demo user with some posts so people can see editing process
+# OpenQuill
+
+OpenQuill is a modern, self-hosted blogging platform built for developers and writers. It allows multiple users to create and manage their own blogs with a clean, minimalist interface.
+
+## ✨ Features
+
+- **Multi-User Support**: Host multiple blogs on a single instance
+- **Markdown Editor**: Write posts in Markdown with live preview
+- **Image Management**: Drag & drop image uploads with alt text support
+- **Customization**: Each blog can have its own description, tags, and hero image
+- **Draft System**: Save posts as drafts before publishing
+- **User Profiles**: Customizable user profiles with avatar and website links
+- **Responsive Design**: Clean, modern UI that works on all devices
+- **Admin Controls**: Manage users and content with admin features
+- **Auto-Save**: Never lose your work with automatic draft saving
+
+## 📦 Installation & Hosting
+
+### Using Docker (Recommended for Hosting)
+
+1. Clone the repository:
+```bash
+git clone https://github.com/ZachLTech/OpenQuill.git
+```
+
+2. Copy the example env file:
+```bash
+cp .env.example .env
+```
+
+3. Configure your .env file with your settings:
+```
+AUTH_SECRET=your_secret
+PORT=3000
+DATABASE_URL=postgresql://...
+# See .env.example for all options
+```
+
+4. Build and run with Docker:
+
+```bash
+docker-compose up -d
+```
+
+### Manual Installation (For Development)
+
+1. Clone and install dependencies:
+
+```bash
+git clone https://github.com/ZachLTech/OpenQuill.git
+cd OpenQuill/app
+npm install
+```
+
+2. Set up your environment variables (see .env.example)
+
+3. Initialize the database:
+
+```bash
+npx prisma db push
+npx prisma generate
+```
+
+4. Run the development server:
+
+```bash
+npm run dev
+```
+
+## Configuration
