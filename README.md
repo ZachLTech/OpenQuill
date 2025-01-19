@@ -1,34 +1,10 @@
-# OpenQuill
-
-todo: make readme :)
-
-This is gonna be a simple yet versatile self-hosted blog platform for anyone to whip up an instance of easily on their server and have many users if they decide to do so :)
-
-
-Things to implement eventually:
-- hiding blogs
-- custom blog sitewide configs
-- user customizable blog color schemes
-- light mode maybe
-- optimize by adding admin, frozen, and other user variables to jwt token to minimize DB queries
-- also optimize with nuxt caching features & pinia (I gotta learn those)
-- add blog pagination (not hard but like I really wanna work on other projects so I'll do it later lol)
-- make the blog URL slug customizable as opposed to it just being the blog title (optimizing potentially bloated URLs)
-- modularize page code a lot more with things such as pages component, posts component, etc.
-- Add newsletter list capability (whoever hosts it can add an SMTP server and it'll send emails to recipients who subscribe to updates from blog)
-- Add code highlighting in post content
-- organize the code a lot more bc rn it's super messy lol (modularize the frontend better with more components)
-- make frontend link with DB somehow so that if there are 2 tabs for example working on the same post, all data updates live accross all instances/sessions of that user
-- update the frontend "// changes DB" comments bc I forgot half the time lol
-- Fix the mediocre docker setup
-- copy paste support for images in post editor
-
+<img src="./OpenQuillLogo.png" />
 
 # OpenQuill
 
-OpenQuill is a modern, self-hosted blogging platform built for developers and writers. It allows multiple users to create and manage their own blogs with a clean, minimalist interface.
+OpenQuill is a modern, self-hosted blogging platform built for developers and writers. It allows multiple users to create and manage their own blogs with a clean, minimalist interface alongside excellent user experience.
 
-## ✨ Features
+## Features
 
 - **Multi-User Support**: Host multiple blogs on a single instance
 - **Markdown Editor**: Write posts in Markdown with live preview
@@ -39,6 +15,7 @@ OpenQuill is a modern, self-hosted blogging platform built for developers and wr
 - **Responsive Design**: Clean, modern UI that works on all devices
 - **Admin Controls**: Manage users and content with admin features
 - **Auto-Save**: Never lose your work with automatic draft saving
+- **More to come...**
 
 ## 📦 Installation & Hosting
 
@@ -68,6 +45,20 @@ DATABASE_URL=postgresql://...
 docker-compose up -d
 ```
 
+### Updating (Docker instance)
+
+1. Pull updates:
+
+```bash
+git pull
+```
+
+2. Rebuild and run instance:
+
+```bash
+docker-compose up -d --build
+```
+
 ### Manual Installation (For Development)
 
 1. Clone and install dependencies:
@@ -94,3 +85,39 @@ npm run dev
 ```
 
 ## Configuration
+
+* `AUTH_SECRET`:  # Secret for Auth security
+* `API_ROUTE_SECRET`:  # Secret for API security
+* `PORT`: # Port where the actual webapp will be run, This can be anything you want.
+* `POSTGRES_PORT`: # Port where your postgres DB will be run, I'd keep this the same if possible.
+* `BASE_URL`: # URL where your instance is hosted. (protocol included - e.g. https://openquill.zachl.tech)
+* `AUTH_ORIGIN`: # Domain hostname where your instance is hosted. (NOT protocol included - e.g. openquill.zachl.tech)
+* `ALLOW_SIGNUPS`: # Boolean - if false, signing up will be disabled on your instance.
+* `ENABLE_SINGLE_BLOG_AUTO_REDIRECT`: Boolean - if enabled and there's only a single owner/user/blog present, navigating to the root of the site will redirect to the blog (instead of a list of all blogs) - this is best for personal single blog OpenQuill instances.
+* `PLATFORM_TITLE`: String which will appear at the top left of the navbar sitewide.
+* `POSTGRES_USER`: DB Admin User, Should keep the same.
+* `POSTGRES_PASSWORD`: DB Admin User Password, You could change this for more security.
+* `POSTGRES_DB`: DB Name, Should keep the same.
+* `DATABASE_URL`: Don't change this if you don't know what you're doing.
+
+## Contributing 
+
+Contributions are welcome! Simply fork and make a PR!
+
+Current development priorities/TODO (in no particular order):
+
+- implement allowing users to hide their blogs
+- custom blog sitewide configs (color schemes for blogs, more modularity, etc.)
+- light mode maybe
+- optimize by adding admin, frozen, and other user variables to jwt token to minimize DB queries
+- also optimize with nuxt caching features & pinia
+- add blog pagination to optimize home page loading times(not hard but like I really wanna work on other projects so I'll do it later lol)
+- make the blog URL slug customizable as opposed to it just being the blog title (optimizing potentially bloated URLs)
+- modularize page code a lot more with things such as pages component, posts component, etc.
+- Add newsletter list capability (whoever hosts it can add an SMTP server and it'll send emails to recipients who subscribe to updates from blog)
+- Add code syntax highlighting in post content render
+- organize the code a lot more bc rn it's super messy lol (modularize the frontend better with more components)
+- make frontend link with DB somehow so that if there are 2 tabs for example working on the same post, all data updates live accross all instances/sessions of that user
+- update the frontend "// changes DB" comments bc I forgot to use them half the time lol
+- Fix the mediocre docker setup
+- Implement image copy and paste support for post editor
