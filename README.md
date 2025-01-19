@@ -150,3 +150,7 @@ Current development priorities/TODO (in no particular order):
 ### Issues
 
 Please feel free to create an issue if a bug is found or even if you simply have a feature request :)
+
+## License
+
+OpenQuill is open-source software licensed under the MIT license.
