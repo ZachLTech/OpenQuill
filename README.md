@@ -8,6 +8,7 @@ OpenQuill is a modern, self-hosted blogging platform built for developers and wr
 
 ## Features
 
+- **Simple Hosting**: Very easy to self host with just a few commands
 - **Multi-User Support**: Host multiple blogs on a single instance
 - **Markdown Editor**: Write posts in Markdown with live preview
 - **Image Management**: Drag & drop image uploads with alt text support

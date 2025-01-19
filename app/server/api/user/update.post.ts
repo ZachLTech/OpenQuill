@@ -45,24 +45,28 @@ export default eventHandler(async (event) => {
 
 	const updateData: UserUpdateInput = {};
 
-	if (body.name != undefined && body.name != user?.name) {
+	if (body.name && body.name != user?.name) {
 		updateData.name = body.name;
 	}
 
-	if (body.email != undefined && body.email != user?.email) {
+	if (body.email && body.email != user?.email) {
 		updateData.email = body.email;
 	}
 
-	if (body.password != undefined && body.password != user?.password) {
-		const hashedPassword = await hash(body.password, 10);
-		updateData.password = hashedPassword;
+	if (body.password && body.password != user?.password) {
+		if (body.password != '') {
+			if (body.password != 'Placeholder') {
+				const hashedPassword = await hash(body.password, 10);
+				updateData.password = hashedPassword;
+			}
+		}
 	}
 
-	if (body.image != undefined && body.image != user?.image) {
+	if (body.image && body.image != user?.image) {
 		updateData.image = body.image;
 	}
 
-	if (body.website != undefined && body.website != user?.website) {
+	if (body.website && body.website != user?.website) {
 		updateData.website = body.website;
 	}
 
