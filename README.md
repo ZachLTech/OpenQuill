@@ -51,7 +51,7 @@ There is a demo instance running at [openquill.zachl.tech](https://openquill.zac
 
 `Password`: Testing123!
 
-You can also view a walkthrough on setting up OpenQuill which includes a tour [here]()
+You can also view a walkthrough on setting up OpenQuill which includes a tour [here](https://www.youtube.com/watch?v=gf_Ym2R43ec)
 
 ### [Gallery](./gallery/README.md)
 
