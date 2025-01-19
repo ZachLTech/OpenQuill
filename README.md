@@ -146,3 +146,7 @@ Current development priorities/TODO (in no particular order):
 - update the frontend "// changes DB" comments bc I forgot to use them half the time lol
 - Fix the mediocre docker setup
 - Implement image copy and paste support for post editor
+
+### Issues
+
+Please feel free to create an issue if a bug is found or even if you simply have a feature request :)
