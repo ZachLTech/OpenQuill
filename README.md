@@ -2,6 +2,15 @@
   <img width="500" src="./OpenQuillLogo.png" /> 
 </p>
 
+<p align="center">
+  <img src="https://img.shields.io/github/stars/ZachLTech/OpenQuill?style=social" alt="GitHub stars">
+  <img src="https://img.shields.io/github/forks/ZachLTech/OpenQuill?style=social" alt="GitHub forks">
+  <img src="https://img.shields.io/github/license/ZachLTech/OpenQuill" alt="License">
+  <img src="https://img.shields.io/website?url=https%3A%2F%2Fopenquill.zachl.tech&label=Demo%20Site" alt="Demo Status">
+  <img src="https://img.shields.io/github/issues/ZachLTech/OpenQuill" alt="GitHub issues">
+  <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome">
+</p>
+
 # OpenQuill
 
 OpenQuill is a modern, self-hosted blogging platform built for developers and writers. It allows multiple users to create and manage their own blogs with a clean, minimalist interface alongside excellent user experience.
@@ -28,6 +37,10 @@ There is a demo instance running at [openquill.zachl.tech](https://openquill.zac
 `Password`: Testing123!
 
 You can also view a walkthrough on setting up OpenQuill which includes a tour [here]()
+
+### [Gallery](./gallery/README.md)
+
+View a gallery of screenshots from the demo instance at [`/gallery/README.md`](./gallery/README.md) 
 
 ## Installation & Hosting
 
