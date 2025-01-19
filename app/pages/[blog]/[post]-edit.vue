@@ -24,6 +24,7 @@ const images = ref<Image[]>([]);
 const showAltModal = ref(false);
 const pendingImage = ref<{ file: File; dataUrl: string } | null>(null);
 const pendingAlt = ref<string | null>("");
+const altLoading = ref(false)
 const editingImageId = ref<string | null>(null);
 const hasChanges = ref(false);
 const currentSessionUser = data.value?.user;
@@ -349,7 +350,7 @@ async function editAltText(imageId: string, currentAlt: string | null) {
 
 async function updateImageAlt() {
 	try {
-		loading.value = true;
+		altLoading.value = true;
 		await $fetch("/api/blog/posts/images/update", {
 			method: "POST",
 			body: {
@@ -373,7 +374,7 @@ async function updateImageAlt() {
 		error.value =
 			e?.response?._data?.message || "Failed to update alt text";
 	} finally {
-		loading.value = false;
+		altLoading.value = false;
 	}
 }
 
@@ -441,6 +442,8 @@ async function showNextImagePrompt() {
 }
 
 async function confirmImageUpload() {
+	altLoading.value = true
+
 	if (currentUserFull && currentUserFull.frozen) {
 		error.value = "You can't do this. Your account is currently frozen.";
 		return;
@@ -492,6 +495,8 @@ async function confirmImageUpload() {
 	} catch (e: any) {
 		imageError.value = e.message;
 	}
+
+	altLoading.value = false
 }
 
 function handleTagInput(event: Event) {
@@ -1000,7 +1005,7 @@ onUnmounted(() => {
 					:disabled="!pendingAlt.trim()"
 					class="px-4 py-2 bg-primary text-text rounded-lg hover:bg-opacity-90 transition-all disabled:bg-opacity-50 disabled:cursor-not-allowed"
 				>
-					{{ isEditing ? "Update" : "Upload Image" }}
+					{{ altLoading ? "Loading..." : isEditing ? "Update" : "Upload Image" }}
 				</button>
 			</div>
 		</div>
