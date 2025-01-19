@@ -11,7 +11,7 @@ export default eventHandler(async (event) => {
 	const body = await readBody(event);
 	let posts;
 
-	if (body.blog) {
+	if (body.blogId) {
 		posts = await event.context.prisma.post.findMany({
 			where: {
 				published: true,
