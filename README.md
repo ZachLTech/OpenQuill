@@ -21,16 +21,13 @@ OpenQuill is a modern, self-hosted blogging platform built for developers and wr
 - [Gallery](#gallery)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-    - [Docker Install](#docker-install)
-    - [Manual Install](#manual-install)
+  - [Hosting With Docker](#hosting-with-docker)
+    - [Updating Docker Instance](#updating-docker-instance)
+  - [Manual Installation For Development](#manual-installation-for-development)
 - [Configuration](#configuration)
   - [Environment Variables](#environment-variables)
-  - [Database Setup](#database-setup)
-- [Development](#development)
-  - [Tech Stack](#tech-stack)
-  - [Project Structure](#project-structure)
 - [Contributing](#contributing)
+  - [Issues](#issues)
 - [License](#license)
 
 ## Features
@@ -62,7 +59,17 @@ View a gallery of screenshots from the demo instance at [`/gallery/README.md`](.
 
 ## Installation & Hosting
 
-### Using Docker (Recommended for Hosting)
+###  Prerequisites
+
+Before hosting OpenQuill, ensure you have:
+
+- [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) (for Docker installation)
+- Or for manual installation:
+    - [Node.js](https://nodejs.org/) (v18 or higher)
+    - [PostgreSQL](https://www.postgresql.org/download/) database
+    - [Git](https://git-scm.com/downloads)
+
+### Hosting With Docker
 
 1. Clone the repository:
 ```bash
@@ -88,7 +95,7 @@ DATABASE_URL=postgresql://...
 docker-compose up -d
 ```
 
-### Updating (Docker instance)
+### Updating Docker Instance
 
 1. Pull updates:
 
@@ -102,7 +109,7 @@ git pull
 docker-compose up -d --build
 ```
 
-### Manual Installation (For Development)
+### Manual Installation For Development
 
 1. Clone and install dependencies:
 
@@ -128,6 +135,8 @@ npm run dev
 ```
 
 ## Configuration
+
+### Environment Variables
 
 * `AUTH_SECRET`:  # Secret for Auth security
 * `API_ROUTE_SECRET`:  # Secret for API security
