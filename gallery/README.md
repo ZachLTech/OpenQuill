@@ -14,24 +14,24 @@ Visual tour of OpenQuill's key features and interfaces.
 *Individual blog homepage with post collection*
 
 ![Blog Home with Tags](./images/blog-home-2.png)
-*Blog view with tag filtering and post previews*
+*Individual blog homepage with post collection*
 
 ### Blog Owner View
 ![Blog Owner Dashboard](./images/blog-home-as-owner-1.png)
 *Enhanced controls for blog owners*
 
 ![Blog Management](./images/blog-home-as-owner-2.png)
-*Post management interface for blog owners*
+*Post management interface for blog owners with not yet published posts*
 
 ![Blog Editor Access](./images/blog-home-as-owner-with-editor-1.png)
-*Editor interface with post creation tools*
+*Editor interface with blog editing tools*
 
 ## 📖 Post Experience
 ![Post View](./images/blog-post-1.png)
 *Clean reading experience for blog posts*
 
 ![Post with Media](./images/blog-post-2.png)
-*Post layout with images and rich content*
+*Post layout with images and rich content & a more from this blog section*
 
 ### Post Editor
 ![Post Editor Interface](./images/post-editor-1.png)
@@ -46,17 +46,17 @@ Visual tour of OpenQuill's key features and interfaces.
 
 ## ⚙️ Administration
 ![Admin Dashboard](./images/admin-dashboard.png)
-*Administrative controls and platform management*
+*Administrative controls and platform management for instance admins*
 
 ## 🆕 New User Onboarding
 ![Welcome Screen](./images/new-user-intro-1.png)
 *Initial welcome experience*
 
 ![Setup Guide 1](./images/new-user-intro-2.png)
-*Blog setup guidance*
+*Initial welcome experience*
 
 ![Setup Guide 2](./images/new-user-intro-3.png)
-*Profile customization walkthrough*
+*Initial welcome experience*
 
 ![Setup Complete](./images/new-user-intro-4.png)
 *Completion of onboarding process*
