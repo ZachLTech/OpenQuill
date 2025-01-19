@@ -15,6 +15,24 @@
 
 OpenQuill is a modern, self-hosted blogging platform built for developers and writers. It allows multiple users to create and manage their own blogs with a clean, minimalist interface alongside excellent user experience.
 
+## 📑 Table of Contents
+- [Features](#features)
+- [Demo](#demo)
+- [Gallery](#gallery)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+    - [Docker Install](#docker-install)
+    - [Manual Install](#manual-install)
+- [Configuration](#configuration)
+  - [Environment Variables](#environment-variables)
+  - [Database Setup](#database-setup)
+- [Development](#development)
+  - [Tech Stack](#tech-stack)
+  - [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Features
 
 - **Simple Hosting**: Very easy to self host with just a few commands
