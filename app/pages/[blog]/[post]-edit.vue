@@ -1002,7 +1002,7 @@ onUnmounted(() => {
 				</button>
 				<button
 					@click="isEditing ? updateImageAlt() : confirmImageUpload()"
-					:disabled="!pendingAlt.trim()"
+					:disabled="!pendingAlt.trim() || altLoading"
 					class="px-4 py-2 bg-primary text-text rounded-lg hover:bg-opacity-90 transition-all disabled:bg-opacity-50 disabled:cursor-not-allowed"
 				>
 					{{ altLoading ? "Loading..." : isEditing ? "Update" : "Upload Image" }}
