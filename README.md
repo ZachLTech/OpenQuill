@@ -21,6 +21,7 @@ Things to implement eventually:
 - make frontend link with DB somehow so that if there are 2 tabs for example working on the same post, all data updates live accross all instances/sessions of that user
 - update the frontend "// changes DB" comments bc I forgot half the time lol
 - Fix the mediocre docker setup
+- copy paste support for images in post editor
 
 
 TODO: 
