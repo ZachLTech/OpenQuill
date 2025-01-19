@@ -1,5 +1,5 @@
 <p align="center"> 
-  <img width="500" src="./OpenQuillLogo.png" /> 
+  <img width="500" src="https://github.com/ZachLTech/OpenQuill/blob/main/OpenQuillLogo.png" /> 
 </p>
 
 <p align="center">
